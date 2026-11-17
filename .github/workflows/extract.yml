@@ -12,7 +12,7 @@ jobs:
         run: |
           unzip -o photo-editor-tauri.zip
           rm photo-editor-tauri.zip
-          for d in */; do if [ -f "$d/package.json" ] && [ -f "$d/src-tauri/Cargo.toml" ]; then shopt -s dotglob; mv "$d"* .; rmdir "$d"; break; fi; done
+          if [ -d photo-editor-tauri ]; then cp -a photo-editor-tauri/. .; rm -rf photo-editor-tauri; fi
           rm -f .github/workflows/extract.yml
           ls -la
           find . -path ./.git -prune -o -type f -print | sort
