@@ -1,0 +1,1 @@
+{"description":"ویرایشگر عکس ویندوزی با Rust + Tauri — الهام‌گرفته از PhotoInstrument","devDependencies":{"@tauri-apps/api":"^2.0.0","@tauri-apps/cli":"^2.0.0"},"name":"photo-editor-tauri","private":true,"scripts":{"build":"tauri build","dev":"tauri dev","tauri":"tauri"},"type":"module","version":"1.0.0"}

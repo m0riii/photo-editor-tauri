@@ -1,0 +1,57 @@
+*{box-sizing:border-box}
+:root{--bg:#1e2126;--panel:#26292f;--panel2:#2e3238;--line:#3a3e45;--text:#e8eaf0;--muted:#9aa0ab;--accent:#e0533d;--accent2:#2f9e6e;--btn:#34383f}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Vazirmatn,Tahoma,"Segoe UI",sans-serif;font-size:14px;overflow:hidden;display:flex;flex-direction:column}
+button{font-family:inherit;cursor:pointer}
+.topbar{display:flex;align-items:center;gap:16px;padding:8px 14px;background:#191b1f;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .logo{font-size:28px}
+.brand strong{display:block;font-size:16px}
+.brand small{color:var(--muted);font-size:11px}
+.file-actions{display:flex;gap:6px;flex-wrap:wrap}
+.btn{background:var(--btn);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:7px 12px;font-size:13px}
+.btn:hover{filter:brightness(1.2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.danger{background:#5a2320;border-color:#7a2d28}
+.btn.small{padding:4px 9px}
+.btn:disabled{opacity:.45;cursor:default}
+.zoom-box{display:flex;align-items:center;gap:6px;margin-inline-start:auto}
+.zoom-box span{min-width:52px;text-align:center}
+.layout{flex:1;display:flex;min-height:0}
+.tools{width:92px;background:var(--panel);border-inline-end:1px solid var(--line);display:flex;flex-direction:column;gap:4px;padding:8px 6px;overflow-y:auto}
+.tool{background:transparent;border:1px solid transparent;border-radius:10px;color:var(--text);padding:8px 2px;font-size:20px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tool span{font-size:10.5px;line-height:1.2}
+.tool:hover{background:var(--panel2)}
+.tool.active{background:#3d2b28;border-color:var(--accent);color:#ffb4a6}
+.canvas-area{flex:1;display:flex;flex-direction:column;min-width:0;background:#141518}
+.canvas-wrap{flex:1;position:relative;overflow:auto;display:flex;align-items:center;justify-content:center;padding:18px}
+.canvas-wrap canvas{position:absolute;box-shadow:0 8px 40px rgba(0,0,0,.55);background:#fff}
+#overlayCanvas{pointer-events:none;background:transparent}
+#mainCanvas{cursor:crosshair}
+.empty-hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:3}
+.hint-card{text-align:center;background:rgba(38,41,47,.92);border:1px dashed var(--line);border-radius:16px;padding:32px 44px;max-width:480px}
+.hint-icon{font-size:52px}
+.hint-card h2{margin:8px 0 4px}
+.hint-card p{color:var(--muted)}
+.hint-note{font-size:12px}
+.statusbar{display:flex;gap:18px;padding:6px 12px;background:#191b1f;border-top:1px solid var(--line);color:var(--muted);font-size:12px;flex-wrap:wrap}
+.statusbar #statusMsg{color:#8fd6a8}
+.panel{width:300px;background:var(--panel);border-inline-start:1px solid var(--line);overflow-y:auto;padding:10px}
+.panel details{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:8px}
+.panel summary{cursor:pointer;font-weight:700;padding:2px 0}
+.panel label{display:block;font-size:12.5px;color:#cfd3da;margin:8px 0}
+.panel label .v{float:left;color:#fff;font-weight:700}
+.panel input[type=range]{width:100%;accent-color:var(--accent)}
+.panel input[type=text],.panel input[type=number],.panel select{width:100%;background:#191b1f;color:var(--text);border:1px solid var(--line);border-radius:6px;padding:6px;margin-top:4px}
+.panel input[type=color]{width:100%;height:34px;background:none;border:none;padding:0}
+.row{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.row .btn{flex:1}
+.tip{font-size:12px;color:var(--muted);line-height:1.7}
+.check{display:flex;align-items:center;gap:6px}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.layers-list{margin-top:8px}
+.layer-item{display:flex;align-items:center;gap:8px;background:#191b1f;border:1px solid var(--line);border-radius:8px;padding:6px 8px;margin-bottom:6px;font-size:12.5px;cursor:pointer}
+.layer-item.active{border-color:var(--accent)}
+.layer-item .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.layer-item button{background:none;border:none;color:var(--muted);font-size:14px}
+@media (max-width:900px){.panel{width:240px}.tools{width:74px}}

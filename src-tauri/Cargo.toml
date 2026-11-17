@@ -1,0 +1,23 @@
+[package]
+name = "photo-editor"
+version = "1.0.0"
+description = "ویرایشگر عکس ویندوزی با Rust + Tauri — الهام‌گرفته از PhotoInstrument"
+authors = ["Mori"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+base64 = "0.22"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "bmp", "gif", "webp"] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
