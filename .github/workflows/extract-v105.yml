@@ -39,6 +39,7 @@ jobs:
           find . -path ./.git -prune -o -type f -print | sort
       - name: Verify v1.0.5 contents
         run: |
+          set -x
           test -f package.json
           test -f src-tauri/Cargo.toml
           test -f src-tauri/tauri.conf.json
@@ -48,8 +49,8 @@ jobs:
           grep -q 'Mori Instrument' src-tauri/tauri.conf.json
           grep -q 'Graphics and Design' src-tauri/tauri.conf.json
           grep -q 'icon.ico' src-tauri/tauri.conf.json
-          grep -q 'permissions: contents: write' .github/workflows/build-windows.yml
-          grep -q 'permissions: contents: write' .github/workflows/build-macos.yml
+          grep -A1 '^permissions:' .github/workflows/build-windows.yml | grep -q 'contents: write'
+          grep -A1 '^permissions:' .github/workflows/build-macos.yml | grep -q 'contents: write'
           grep -q 'I18N' src/app.js
           grep -q 'applyLanguage' src/app.js
           grep -q 'mori-lang' src/app.js || grep -rq 'mori-lang' src/
