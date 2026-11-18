@@ -12,39 +12,40 @@
 <header class="titlebar">
   <span class="logo">📷</span>
   <strong>Mori Instrument</strong>
-  <small>PhotoInstrument style • Rust + Tauri • نسخه ۱٫۰٫۴</small>
+  <small data-i18n="versionLine">PhotoInstrument style • Rust + Tauri • نسخه ۱٫۰٫۵</small>
 </header>
 
 <!-- نوار منوی تیره: File / Edit / Plugins / Options / Help -->
 <nav class="menubar" aria-label="منو">
-  <button type="button" class="menu-item">فایل <span class="menu-en">File</span></button>
-  <button type="button" class="menu-item">ویرایش <span class="menu-en">Edit</span></button>
-  <button type="button" class="menu-item">پلاگین‌ها <span class="menu-en">Plugins</span></button>
-  <button type="button" class="menu-item">گزینه‌ها <span class="menu-en">Options</span></button>
-  <button type="button" class="menu-item" id="menuHelp">راهنما <span class="menu-en">Help</span></button>
+  <button type="button" class="menu-item" data-i18n="menuFile">فایل <span class="menu-en">File</span></button>
+  <button type="button" class="menu-item" data-i18n="menuEdit">ویرایش <span class="menu-en">Edit</span></button>
+  <button type="button" class="menu-item" data-i18n="menuPlugins">پلاگین‌ها <span class="menu-en">Plugins</span></button>
+  <button type="button" class="menu-item" data-i18n="menuOptions">گزینه‌ها <span class="menu-en">Options</span></button>
+  <button type="button" class="menu-item" id="menuHelp" data-i18n="menuHelp">راهنما <span class="menu-en">Help</span></button>
 </nav>
 
 <!-- ردیف ابزار دوم: فایل، Original، واگرد/ازنو، زوم، Apply، پیش‌نمایش -->
 <div class="toolbar">
   <div class="file-actions">
-    <button id="btnOpen" class="btn primary">📂 باز کردن عکس</button>
-    <button id="btnSave" class="btn">💾 ذخیره</button>
-    <button id="btnSaveAs" class="btn">💾 ذخیره با نام…</button>
+    <button id="btnOpen" class="btn primary" data-i18n="open">📂 باز کردن عکس</button>
+    <button id="btnSave" class="btn" data-i18n="save">💾 ذخیره</button>
+    <button id="btnSaveAs" class="btn" data-i18n="saveAs">💾 ذخیره با نام…</button>
   </div>
-  <button id="btnReset" class="btn primary" title="بازگشت به عکس اصلی">Original — اصلی</button>
-  <button id="btnUndo" class="btn" title="Ctrl+Z">↩ واگرد</button>
-  <button id="btnRedo" class="btn" title="Ctrl+Y">↪ از نو</button>
+  <button id="btnReset" class="btn primary" data-i18n="original" data-i18n-title="originalTitle">Original — اصلی</button>
+  <button id="btnUndo" class="btn" title="Ctrl+Z" data-i18n="undo">↩ واگرد</button>
+  <button id="btnRedo" class="btn" title="Ctrl+Y" data-i18n="redo">↪ از نو</button>
   <div class="zoom-box">
     <button id="zoomOut" class="btn small">−</button>
     <span id="zoomLabel">۱۰۰٪</span>
     <button id="zoomIn" class="btn small">+</button>
-    <button id="zoomFit" class="btn small">متناسب</button>
+    <button id="zoomFit" class="btn small" data-i18n="fit">متناسب</button>
   </div>
-  <button id="btnApplyAdjust" class="btn primary">✓ Apply — اعمال (Rust)</button>
-  <button id="btnAutoRetouch" class="btn" title="روتوش خودکار — مثل Facetune Enhance">✨ روتوش خودکار</button>
-  <button id="btnAbout" class="btn" title="درباره برنامه">ℹ️ درباره</button>
+  <button id="btnApplyAdjust" class="btn primary" data-i18n="applyAdjust">✓ Apply — اعمال (Rust)</button>
+  <button id="btnAutoRetouch" class="btn" data-i18n="autoRetouch" data-i18n-title="autoRetouchTitle">✨ روتوش خودکار</button>
+  <button id="btnAbout" class="btn" title="درباره برنامه" data-i18n="aboutBtn">ℹ️ درباره</button>
+  <button id="btnLang" class="btn" title="زبان / Language">🌐 <span data-i18n="langBtn">زبان</span></button>
   <div class="thumb-preview" title="پیش‌نمایش عکس">
-    <span>پیش‌نمایش</span>
+    <span data-i18n="preview">پیش‌نمایش</span>
   </div>
 </div>
 
@@ -54,7 +55,7 @@
 
     <!-- شبکه ابزارها -->
     <section class="instruments">
-      <div class="section-header">Instruments — ابزارها</div>
+      <div class="section-header" data-i18n="instruments">Instruments — ابزارها</div>
       <div class="tools-grid" id="toolsBar" aria-label="ابزارها">
         <button class="tool active" data-tool="move" title="Brush — جابه‌جایی لایه">🖌️<b class="en">Brush</b><span>جابه‌جا</span></button>
         <button class="tool" data-tool="skin" title="Glamour Skin — صاف کردن پوست">✨<b class="en">Glamour Skin</b><span>صاف پوست</span></button>
@@ -77,17 +78,17 @@
 
     <!-- پنل حالت ابزار انتخاب‌شده، مثل Glamour Skin در اسکرین‌شات -->
     <section class="mode-panel">
-      <div class="section-header">Mode — حالت ابزار</div>
+      <div class="section-header" data-i18n="mode">Mode — حالت ابزار</div>
       <div class="mode-name"><span id="statusTool">ابزار: جابه‌جا</span></div>
       <div class="mode-row">
-        <label class="check"><input type="radio" name="brushMode" checked> Brush — قلم</label>
-        <label class="check"><input type="radio" name="brushMode"> Eraser — پاک‌کن</label>
+        <label class="check"><input type="radio" name="brushMode" checked> <span data-i18n="brushMode">Brush — قلم</span></label>
+        <label class="check"><input type="radio" name="brushMode"> <span data-i18n="eraserMode">Eraser — پاک‌کن</span></label>
       </div>
-      <label>Size — اندازه قلم <span id="brushSizeVal">۶۰</span> پیکسل
+      <label><span data-i18n="sizeLabel">Size — اندازه قلم</span> <span id="brushSizeVal">۶۰</span> <span data-i18n="pixels">پیکسل</span>
         <input type="range" id="brushSize" min="5" max="500" value="60"></label>
-      <label>Hardness — سختی / قدرت <span id="brushStrengthVal">۵۰٪</span>
+      <label><span data-i18n="hardnessLabel">Hardness — سختی / قدرت</span> <span id="brushStrengthVal">۵۰٪</span>
         <input type="range" id="brushStrength" min="5" max="100" value="50"></label>
-      <label>رنگ (برای رنگی کردن)
+      <label><span data-i18n="colorLabel">رنگ (برای رنگی کردن)</span>
         <input type="color" id="brushColor" value="#ff5a5a"></label>
       <p class="tip" id="toolTip">برای کلون: Alt + کلیک روی منبع، بعد روی مقصد بکشید.</p>
     </section>
@@ -95,93 +96,93 @@
     <!-- تنظیمات، زیر پنل ابزار -->
     <section class="panel">
       <details open>
-        <summary>☀️ نور و رنگ — Brightness / Contrast</summary>
-        <label>روشنایی <span class="v" id="vBright">۰</span><input type="range" id="adjBright" min="-100" max="100" value="0"></label>
-        <label>کنتراست <span class="v" id="vContrast">۰</span><input type="range" id="adjContrast" min="-100" max="100" value="0"></label>
-        <label>اشباع رنگ <span class="v" id="vSat">۰</span><input type="range" id="adjSat" min="-100" max="100" value="0"></label>
-        <label>گرما (Warmth) <span class="v" id="vWarm">۰</span><input type="range" id="adjWarm" min="-100" max="100" value="0"></label>
-        <label>چرخش رنگ (Hue) <span class="v" id="vHue">۰°</span><input type="range" id="adjHue" min="-180" max="180" value="0"></label>
-        <label>تاری (Blur) <span class="v" id="vBlur">۰</span><input type="range" id="adjBlur" min="0" max="10" value="0"></label>
-        <label>وضوح (Sharpen) <span class="v" id="vSharp">۰</span><input type="range" id="adjSharp" min="0" max="100" value="0"></label>
+        <summary data-i18n="sumLight">☀️ نور و رنگ — Brightness / Contrast</summary>
+        <label><span data-i18n="brightness">روشنایی</span> <span class="v" id="vBright">۰</span><input type="range" id="adjBright" min="-100" max="100" value="0"></label>
+        <label><span data-i18n="contrast">کنتراست</span> <span class="v" id="vContrast">۰</span><input type="range" id="adjContrast" min="-100" max="100" value="0"></label>
+        <label><span data-i18n="saturation">اشباع رنگ</span> <span class="v" id="vSat">۰</span><input type="range" id="adjSat" min="-100" max="100" value="0"></label>
+        <label><span data-i18n="warmth">گرما (Warmth)</span> <span class="v" id="vWarm">۰</span><input type="range" id="adjWarm" min="-100" max="100" value="0"></label>
+        <label><span data-i18n="hue">چرخش رنگ (Hue)</span> <span class="v" id="vHue">۰°</span><input type="range" id="adjHue" min="-180" max="180" value="0"></label>
+        <label><span data-i18n="blur">تاری (Blur)</span> <span class="v" id="vBlur">۰</span><input type="range" id="adjBlur" min="0" max="10" value="0"></label>
+        <label><span data-i18n="sharpen">وضوح (Sharpen)</span> <span class="v" id="vSharp">۰</span><input type="range" id="adjSharp" min="0" max="100" value="0"></label>
         <div class="row">
-          <button id="btnResetAdjust" class="btn">بازنشانی</button>
+          <button id="btnResetAdjust" class="btn" data-i18n="reset">بازنشانی</button>
         </div>
-        <label>سطوح رنگ (Levels) — سایه / میانه / نور
+        <label><span data-i18n="levelsLabel">سطوح رنگ (Levels) — سایه / میانه / نور</span>
           <input type="range" id="lvlBlack" min="0" max="120" value="0" title="نقطه سیاه">
           <input type="range" id="lvlWhite" min="130" max="255" value="255" title="نقطه سفید"></label>
-        <button id="btnApplyLevels" class="btn">✓ اعمال سطوح رنگ</button>
+        <button id="btnApplyLevels" class="btn" data-i18n="applyLevels">✓ اعمال سطوح رنگ</button>
       </details>
 
       <details>
-        <summary>🌟 افکت‌ها — Glow / Denoise</summary>
-        <label>درخشش (Glow) <span class="v" id="vGlow">۰</span>
+        <summary data-i18n="sumEffects">🌟 افکت‌ها — Glow / Denoise</summary>
+        <label><span data-i18n="glow">درخشش (Glow)</span> <span class="v" id="vGlow">۰</span>
           <input type="range" id="glowAmt" min="0" max="100" value="0"></label>
-        <button id="btnApplyGlow" class="btn">✓ اعمال درخشش</button>
-        <button id="btnDenoise" class="btn">🧹 نویزگیری (Denoise — Rust)</button>
+        <button id="btnApplyGlow" class="btn" data-i18n="applyGlow">✓ اعمال درخشش</button>
+        <button id="btnDenoise" class="btn" data-i18n="denoise">🧹 نویزگیری (Denoise — Rust)</button>
       </details>
 
       <details>
-        <summary>🎞️ فیلترهای آماده</summary>
+        <summary data-i18n="sumFilters">🎞️ فیلترهای آماده</summary>
         <div class="filters">
-          <button data-filter="original" class="btn">اصلی</button>
-          <button data-filter="warm" class="btn">گرم</button>
-          <button data-filter="cool" class="btn">سرد</button>
-          <button data-filter="bw" class="btn">سیاه‌سفید</button>
-          <button data-filter="vintage" class="btn">قدیمی</button>
-          <button data-filter="vivid" class="btn">زنده</button>
+          <button data-filter="original" class="btn" data-i18n="filterOriginal">اصلی</button>
+          <button data-filter="warm" class="btn" data-i18n="filterWarm">گرم</button>
+          <button data-filter="cool" class="btn" data-i18n="filterCool">سرد</button>
+          <button data-filter="bw" class="btn" data-i18n="filterBw">سیاه‌سفید</button>
+          <button data-filter="vintage" class="btn" data-i18n="filterVintage">قدیمی</button>
+          <button data-filter="vivid" class="btn" data-i18n="filterVivid">زنده</button>
         </div>
       </details>
 
       <details>
-        <summary>🔄 چرخش، چرخاندن و اندازه — Scale / Rotate</summary>
+        <summary data-i18n="sumRotate">🔄 چرخش، چرخاندن و اندازه — Scale / Rotate</summary>
         <div class="row">
-          <button id="btnRotL" class="btn">⟲ ۹۰° چپ</button>
-          <button id="btnRotR" class="btn">⟳ ۹۰° راست</button>
-          <button id="btnFlipH" class="btn">⇔ افقی</button>
-          <button id="btnFlipV" class="btn">⇕ عمودی</button>
+          <button id="btnRotL" class="btn" data-i18n="rotL">⟲ ۹۰° چپ</button>
+          <button id="btnRotR" class="btn" data-i18n="rotR">⟳ ۹۰° راست</button>
+          <button id="btnFlipH" class="btn" data-i18n="flipH">⇔ افقی</button>
+          <button id="btnFlipV" class="btn" data-i18n="flipV">⇕ عمودی</button>
         </div>
-        <label>عرض جدید <input type="number" id="resizeW" min="1" max="12000" placeholder="عرض"></label>
-        <label>ارتفاع جدید <input type="number" id="resizeH" min="1" max="12000" placeholder="ارتفاع"></label>
-        <label class="check"><input type="checkbox" id="keepAspect" checked> حفظ نسبت ابعاد</label>
-        <button id="btnResize" class="btn primary">✓ تغییر اندازه (Rust)</button>
+        <label><span data-i18n="newWidth">عرض جدید</span> <input type="number" id="resizeW" min="1" max="12000" data-i18n-ph="widthPh"></label>
+        <label><span data-i18n="newHeight">ارتفاع جدید</span> <input type="number" id="resizeH" min="1" max="12000" data-i18n-ph="heightPh"></label>
+        <label class="check"><input type="checkbox" id="keepAspect" checked> <span data-i18n="keepAspect">حفظ نسبت ابعاد</span></label>
+        <button id="btnResize" class="btn primary" data-i18n="resizeBtn">✓ تغییر اندازه (Rust)</button>
       </details>
 
       <details>
-        <summary>✂️ برش — Crop</summary>
-        <p class="tip">با ابزار برش روی عکس مستطیل بکشید، بعد:</p>
+        <summary data-i18n="sumCrop">✂️ برش — Crop</summary>
+        <p class="tip" data-i18n="cropTip">با ابزار برش روی عکس مستطیل بکشید، بعد:</p>
         <div class="row">
-          <button id="btnCropApply" class="btn primary">✓ اعمال برش</button>
-          <button id="btnCropCancel" class="btn">لغو</button>
+          <button id="btnCropApply" class="btn primary" data-i18n="cropApply">✓ اعمال برش</button>
+          <button id="btnCropCancel" class="btn" data-i18n="cancel">لغو</button>
         </div>
       </details>
 
       <details>
-        <summary>🔤 متن — Text</summary>
-        <label>متن <input type="text" id="textInput" placeholder="متن را اینجا بنویسید" value="سلام دنیا"></label>
-        <label>اندازه <input type="number" id="textSize" min="10" max="300" value="48"></label>
-        <label>رنگ <input type="color" id="textColor" value="#ffffff"></label>
-        <label>فونت <select id="textFont"><option value="Vazir, Tahoma, sans-serif">وزیر (Vazir)</option><option value="serif">Serif</option><option value="sans-serif">Sans</option><option value="monospace">Monospace</option></select></label>
-        <button id="btnTextApply" class="btn primary">✓ افزودن متن به‌عنوان لایه</button>
-        <p class="tip">بعد از افزودن، متن را با ابزار «جابه‌جا» می‌توانید بکشید.</p>
+        <summary data-i18n="sumText">🔤 متن — Text</summary>
+        <label><span data-i18n="textLabel">متن</span> <input type="text" id="textInput" data-i18n-ph="textPh" value="سلام دنیا"></label>
+        <label><span data-i18n="textSize">اندازه</span> <input type="number" id="textSize" min="10" max="300" value="48"></label>
+        <label><span data-i18n="textColor">رنگ</span> <input type="color" id="textColor" value="#ffffff"></label>
+        <label><span data-i18n="textFont">فونت</span> <select id="textFont"><option value="Vazir, Tahoma, sans-serif">وزیر (Vazir)</option><option value="serif">Serif</option><option value="sans-serif">Sans</option><option value="monospace">Monospace</option></select></label>
+        <button id="btnTextApply" class="btn primary" data-i18n="addText">✓ افزودن متن به‌عنوان لایه</button>
+        <p class="tip" data-i18n="textTip">بعد از افزودن، متن را با ابزار «جابه‌جا» می‌توانید بکشید.</p>
       </details>
 
       <details>
-        <summary>لایه‌ها — Layers</summary>
-        <div id="layersList" class="layers-list"><p class="tip">هنوز لایه‌ای نیست — متن یا عکس روی هم اضافه کنید.</p></div>
+        <summary data-i18n="sumLayers">لایه‌ها — Layers</summary>
+        <div id="layersList" class="layers-list"><p class="tip" data-i18n="noLayers">هنوز لایه‌ای نیست — متن یا عکس روی هم اضافه کنید.</p></div>
         <div class="row">
-          <button id="btnAddLayerImg" class="btn">➕ لایه از عکس…</button>
-          <button id="btnFlatten" class="btn">⤵ ادغام همه لایه‌ها</button>
+          <button id="btnAddLayerImg" class="btn" data-i18n="addLayerImg">➕ لایه از عکس…</button>
+          <button id="btnFlatten" class="btn" data-i18n="flatten">⤵ ادغام همه لایه‌ها</button>
         </div>
-        <label>شفافیت لایه فعال <span id="layerOpacityVal">۱۰۰٪</span>
+        <label><span data-i18n="layerOpacity">شفافیت لایه فعال</span> <span id="layerOpacityVal">۱۰۰٪</span>
           <input type="range" id="layerOpacity" min="5" max="100" value="100"></label>
       </details>
 
       <details>
-        <summary>📦 تغییر اندازه گروهی — Batch Resize</summary>
-        <p class="tip">چند عکس انتخاب کنید؛ همه به یک اندازه تبدیل و دانلود می‌شوند.</p>
-        <label>عرض <input type="number" id="batchW" value="1024" min="1" max="12000"></label>
-        <label>ارتفاع <input type="number" id="batchH" value="1024" min="1" max="12000"></label>
-        <button id="btnBatch" class="btn primary">📦 انتخاب چند عکس و تبدیل</button>
+        <summary data-i18n="sumBatch">📦 تغییر اندازه گروهی — Batch Resize</summary>
+        <p class="tip" data-i18n="batchTip">چند عکس انتخاب کنید؛ همه به یک اندازه تبدیل و دانلود می‌شوند.</p>
+        <label><span data-i18n="width">عرض</span> <input type="number" id="batchW" value="1024" min="1" max="12000"></label>
+        <label><span data-i18n="height">ارتفاع</span> <input type="number" id="batchH" value="1024" min="1" max="12000"></label>
+        <button id="btnBatch" class="btn primary" data-i18n="batchBtn">📦 انتخاب چند عکس و تبدیل</button>
       </details>
     </section>
   </aside>
@@ -194,19 +195,32 @@
       <div class="empty-hint" id="emptyHint">
         <div class="hint-card">
           <div class="hint-icon">🖼️</div>
-          <h2>عکس را اینجا رها کنید</h2>
-          <p>یا دکمه «باز کردن عکس» را بزنید — JPG ،PNG ،BMP ،GIF</p>
-          <p class="hint-note">عکس شما از دستگاهتان بیرون نمی‌رود؛ همه‌چیز روی همین کامپیوتر پردازش می‌شود.</p>
+          <h2 data-i18n="dropTitle">عکس را اینجا رها کنید</h2>
+          <p data-i18n="dropText">یا دکمه «باز کردن عکس» را بزنید — JPG ،PNG ،BMP ،GIF</p>
+          <p class="hint-note" data-i18n="dropNote">عکس شما از دستگاهتان بیرون نمی‌رود؛ همه‌چیز روی همین کامپیوتر پردازش می‌شود.</p>
         </div>
       </div>
     </div>
     <div class="statusbar">
       <span id="statusSize">—</span>
-      <span id="statusEngine">موتور: Rust + Tauri</span>
+      <span id="statusEngine" data-i18n="engine">موتور: Rust + Tauri</span>
       <span id="statusMsg"></span>
     </div>
   </section>
 </main>
+
+<!-- انتخاب زبان در شروع برنامه -->
+<div id="langModal" class="modal" hidden>
+  <div class="modal-card lang-card">
+    <div class="about-logo">🌐</div>
+    <h2 data-i18n="langTitle">زبان برنامه را انتخاب کنید</h2>
+    <p data-i18n="langSub">Choose the app language</p>
+    <div class="lang-options">
+      <button id="langFa" class="btn lang-option">🇮🇷 فارسی</button>
+      <button id="langEn" class="btn lang-option">🇬🇧 English</button>
+    </div>
+  </div>
+</div>
 
 <!-- پنجره درباره برنامه -->
 <div id="aboutModal" class="modal" hidden>
@@ -214,10 +228,10 @@
     <div class="about-logo">📷</div>
     <h2>Mori Instrument</h2>
     <p class="about-ver">نسخه ۱٫۰٫۴ • Rust + Tauri</p>
-    <p>ساخته شده توسط Mori J</p>
-    <p>ایده از برنامه PhotoInstrument</p>
+    <p data-i18n="aboutBy">ساخته شده توسط Mori J</p>
+    <p data-i18n="aboutIdea">ایده از برنامه PhotoInstrument</p>
     <p class="about-link">photoinstrument.com</p>
-    <button id="aboutClose" class="btn primary">بستن</button>
+    <button id="aboutClose" class="btn primary" data-i18n="close">بستن</button>
   </div>
 </div>
 

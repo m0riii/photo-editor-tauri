@@ -33,7 +33,160 @@ async function hasTauri() {
   try { await tauriInvoke('get_app_info', {}); return true; } catch (e) { return false; }
 }
 function setMsg(msg) { $('statusMsg').textContent = msg || ''; }
-function setToolLabel(name) { $('statusTool').textContent = 'ابزار: ' + name; }
+function setToolLabel(name) { $('statusTool').textContent = t('toolPrefix') + name; }
+
+/* ---------- زبان برنامه (فارسی / English) ---------- */
+const I18N = {
+  fa: {
+    menuFile: 'فایل', menuEdit: 'ویرایش', menuPlugins: 'پلاگین‌ها', menuOptions: 'گزینه‌ها', menuHelp: 'راهنما',
+    open: '📂 باز کردن عکس', save: '💾 ذخیره', saveAs: '💾 ذخیره با نام…',
+    original: 'Original — اصلی', originalTitle: 'بازگشت به عکس اصلی',
+    undo: '↩ واگرد', redo: '↪ از نو', fit: 'متناسب',
+    applyAdjust: '✓ Apply — اعمال (Rust)', autoRetouch: '✨ روتوش خودکار', autoRetouchTitle: 'روتوش خودکار — مثل Facetune Enhance',
+    aboutBtn: 'ℹ️ درباره', langBtn: 'زبان', preview: 'پیش‌نمایش',
+    instruments: 'Instruments — ابزارها', mode: 'Mode — حالت ابزار',
+    brushMode: 'Brush — قلم', eraserMode: 'Eraser — پاک‌کن',
+    sizeLabel: 'Size — اندازه قلم', pixels: 'پیکسل', hardnessLabel: 'Hardness — سختی / قدرت', colorLabel: 'رنگ (برای رنگی کردن)',
+    sumLight: '☀️ نور و رنگ — Brightness / Contrast', sumEffects: '🌟 افکت‌ها — Glow / Denoise',
+    sumFilters: '🎞️ فیلترهای آماده', sumRotate: '🔄 چرخش، چرخاندن و اندازه — Scale / Rotate',
+    sumCrop: '✂️ برش — Crop', sumText: '🔤 متن — Text', sumLayers: 'لایه‌ها — Layers', sumBatch: '📦 تغییر اندازه گروهی — Batch Resize',
+    brightness: 'روشنایی', contrast: 'کنتراست', saturation: 'اشباع رنگ', warmth: 'گرما (Warmth)',
+    hue: 'چرخش رنگ (Hue)', blur: 'تاری (Blur)', sharpen: 'وضوح (Sharpen)',
+    reset: 'بازنشانی', levelsLabel: 'سطوح رنگ (Levels) — سایه / میانه / نور', applyLevels: '✓ اعمال سطوح رنگ',
+    glow: 'درخشش (Glow)', applyGlow: '✓ اعمال درخشش', denoise: '🧹 نویزگیری (Denoise — Rust)',
+    filterOriginal: 'اصلی', filterWarm: 'گرم', filterCool: 'سرد', filterBw: 'سیاه‌سفید', filterVintage: 'قدیمی', filterVivid: 'زنده',
+    rotL: '⟲ ۹۰° چپ', rotR: '⟳ ۹۰° راست', flipH: '⇔ افقی', flipV: '⇕ عمودی',
+    newWidth: 'عرض جدید', newHeight: 'ارتفاع جدید', widthPh: 'عرض', heightPh: 'ارتفاع',
+    keepAspect: 'حفظ نسبت ابعاد', resizeBtn: '✓ تغییر اندازه (Rust)',
+    cropTip: 'با ابزار برش روی عکس مستطیل بکشید، بعد:', cropApply: '✓ اعمال برش', cancel: 'لغو',
+    textLabel: 'متن', textPh: 'متن را اینجا بنویسید', textSize: 'اندازه', textColor: 'رنگ', textFont: 'فونت',
+    addText: '✓ افزودن متن به‌عنوان لایه', textTip: 'بعد از افزودن، متن را با ابزار «جابه‌جا» می‌توانید بکشید.',
+    noLayers: 'هنوز لایه‌ای نیست — متن یا عکس روی هم اضافه کنید.', addLayerImg: '➕ لایه از عکس…',
+    flatten: '⤵ ادغام همه لایه‌ها', layerOpacity: 'شفافیت لایه فعال',
+    width: 'عرض', height: 'ارتفاع',
+    batchTip: 'چند عکس انتخاب کنید؛ همه به یک اندازه تبدیل و دانلود می‌شوند.', batchBtn: '📦 انتخاب چند عکس و تبدیل',
+    dropTitle: 'عکس را اینجا رها کنید', dropText: 'یا دکمه «باز کردن عکس» را بزنید — JPG ،PNG ،BMP ،GIF',
+    dropNote: 'عکس شما از دستگاهتان بیرون نمی‌رود؛ همه‌چیز روی همین کامپیوتر پردازش می‌شود.',
+    engine: 'موتور: Rust + Tauri',
+    aboutBy: 'ساخته شده توسط Mori J', aboutIdea: 'ایده از برنامه PhotoInstrument', close: 'بستن',
+    langTitle: 'زبان برنامه را انتخاب کنید', langSub: 'Choose the app language',
+    versionLine: 'PhotoInstrument style • Rust + Tauri • نسخه ۱٫۰٫۵', aboutVer: 'نسخه ۱٫۰٫۵ • Rust + Tauri',
+    toolPrefix: 'ابزار: ',
+    msgOpenFirst: 'اول یک عکس باز کنید', msgUndo: 'واگرد انجام شد', msgRedo: 'از نو انجام شد',
+    msgOpened: 'عکس باز شد: ', msgSaved: 'ذخیره شد: ',
+    msgBmpGif: 'در مرورگر BMP/GIF پشتیبانی نمی‌شود؛ نسخه PNG دانلود شد', msgDownloaded: 'دانلود شد: ',
+    msgCloneSrc: 'برای کلون اول Alt + کلیک کنید تا منبع انتخاب شود',
+    msgCropFirst: 'اول با ابزار برش یک مستطیل بکشید', msgCropDone: 'برش اعمال شد',
+    msgWriteText: 'متن را بنویسید', msgTextAdded: 'متن به‌عنوان لایه اضافه شد — با ابزار جابه‌جا می‌توانید آن را بکشید',
+    msgLevelsErr: 'نقطه سفید باید بزرگ‌تر از نقطه سیاه باشد', msgLevelsDone: 'سطوح رنگ اعمال شد',
+    msgGlowMore: 'مقدار درخشش را بیشتر کنید', msgGlowDone: 'درخشش اعمال شد',
+    msgApplying: 'در حال اعمال با Rust…', msgAdjustDone: 'تنظیم نور و رنگ اعمال شد', msgAdjustErr: 'خطا در اعمال تنظیمات: ',
+    msgDenoising: 'در حال نویزگیری با Rust…', msgDenoiseDone: 'نویزگیری انجام شد', msgDenoiseErr: 'خطا در نویزگیری: ',
+    msgRetouching: 'در حال روتوش خودکار با Rust…', msgRetouchDone: 'روتوش خودکار انجام شد ✨', msgRetouchErr: 'خطا در روتوش خودکار: ',
+    msgFilterOrig: 'فیلتر اصلی — بدون تغییر', msgFilterDone: 'فیلتر اعمال شد: ',
+    msgRotated: 'چرخش انجام شد', msgEnterWH: 'عرض و ارتفاع را وارد کنید',
+    msgResizing: 'در حال تغییر اندازه با Rust…', msgResized: 'اندازه تغییر کرد: ', msgResizeErr: 'خطا در تغییر اندازه: ',
+    msgBatchErr: 'خطا در ', msgBatchDone: 'تغییر اندازه گروهی تمام شد: ', msgPhotos: ' عکس',
+    msgTextHere: 'متن در اینجا قرار می‌گیرد — دکمه «افزودن متن» را بزنید',
+    msgClonePicked: 'منبع کلون انتخاب شد — حالا روی مقصد بکشید',
+    msgBackOriginal: 'به عکس اصلی برگشت', msgCropCancel: 'برش لغو شد', msgFlatten: 'همه لایه‌ها ادغام شد',
+    msgLayerAdded: 'لایه عکس اضافه شد', msgDropImage: 'فایل عکس را رها کنید',
+  },
+  en: {
+    menuFile: 'File', menuEdit: 'Edit', menuPlugins: 'Plugins', menuOptions: 'Options', menuHelp: 'Help',
+    open: '📂 Open Image', save: '💾 Save', saveAs: '💾 Save As…',
+    original: 'Original', originalTitle: 'Back to the original image',
+    undo: '↩ Undo', redo: '↪ Redo', fit: 'Fit',
+    applyAdjust: '✓ Apply (Rust)', autoRetouch: '✨ Auto Retouch', autoRetouchTitle: 'Auto Retouch — like Facetune Enhance',
+    aboutBtn: 'ℹ️ About', langBtn: 'Language', preview: 'Preview',
+    instruments: 'Instruments', mode: 'Mode',
+    brushMode: 'Brush', eraserMode: 'Eraser',
+    sizeLabel: 'Size — Brush size', pixels: 'px', hardnessLabel: 'Hardness — Strength', colorLabel: 'Color (for Colorize)',
+    sumLight: '☀️ Brightness / Contrast', sumEffects: '🌟 Effects — Glow / Denoise',
+    sumFilters: '🎞️ Preset Filters', sumRotate: '🔄 Rotate, Flip & Scale',
+    sumCrop: '✂️ Crop', sumText: '🔤 Text', sumLayers: 'Layers', sumBatch: '📦 Batch Resize',
+    brightness: 'Brightness', contrast: 'Contrast', saturation: 'Saturation', warmth: 'Warmth',
+    hue: 'Hue', blur: 'Blur', sharpen: 'Sharpen',
+    reset: 'Reset', levelsLabel: 'Color Levels — Shadows / Midtones / Highlights', applyLevels: '✓ Apply Levels',
+    glow: 'Glow', applyGlow: '✓ Apply Glow', denoise: '🧹 Denoise (Rust)',
+    filterOriginal: 'Original', filterWarm: 'Warm', filterCool: 'Cool', filterBw: 'Black & White', filterVintage: 'Vintage', filterVivid: 'Vivid',
+    rotL: '⟲ 90° Left', rotR: '⟳ 90° Right', flipH: '⇔ Horizontal', flipV: '⇕ Vertical',
+    newWidth: 'New width', newHeight: 'New height', widthPh: 'Width', heightPh: 'Height',
+    keepAspect: 'Keep aspect ratio', resizeBtn: '✓ Resize (Rust)',
+    cropTip: 'Draw a rectangle on the photo with the Crop tool, then:', cropApply: '✓ Apply Crop', cancel: 'Cancel',
+    textLabel: 'Text', textPh: 'Type your text here', textSize: 'Size', textColor: 'Color', textFont: 'Font',
+    addText: '✓ Add Text as Layer', textTip: 'After adding, drag the text with the Move tool.',
+    noLayers: 'No layers yet — add text or an image on top.', addLayerImg: '➕ Layer from Image…',
+    flatten: '⤵ Flatten All Layers', layerOpacity: 'Active layer opacity',
+    width: 'Width', height: 'Height',
+    batchTip: 'Pick several photos; all will be resized to one size and downloaded.', batchBtn: '📦 Pick Photos & Convert',
+    dropTitle: 'Drop your photo here', dropText: 'Or click “Open Image” — JPG, PNG, BMP, GIF',
+    dropNote: 'Your photo never leaves your device; everything is processed on this computer.',
+    engine: 'Engine: Rust + Tauri',
+    aboutBy: 'Made by Mori J', aboutIdea: 'Idea from PhotoInstrument', close: 'Close',
+    langTitle: 'Choose the app language', langSub: 'زبان برنامه را انتخاب کنید',
+    versionLine: 'PhotoInstrument style • Rust + Tauri • Version 1.0.5', aboutVer: 'Version 1.0.5 • Rust + Tauri',
+    toolPrefix: 'Tool: ',
+    msgOpenFirst: 'Open a photo first', msgUndo: 'Undone', msgRedo: 'Redone',
+    msgOpened: 'Photo opened: ', msgSaved: 'Saved: ',
+    msgBmpGif: 'BMP/GIF is not supported in the browser; PNG version downloaded', msgDownloaded: 'Downloaded: ',
+    msgCloneSrc: 'For Clone, Alt + Click to pick the source first',
+    msgCropFirst: 'Draw a rectangle with the Crop tool first', msgCropDone: 'Crop applied',
+    msgWriteText: 'Write the text first', msgTextAdded: 'Text added as a layer — drag it with the Move tool',
+    msgLevelsErr: 'White point must be greater than black point', msgLevelsDone: 'Levels applied',
+    msgGlowMore: 'Increase the glow amount first', msgGlowDone: 'Glow applied',
+    msgApplying: 'Applying with Rust…', msgAdjustDone: 'Brightness & color applied', msgAdjustErr: 'Error applying adjustments: ',
+    msgDenoising: 'Denoising with Rust…', msgDenoiseDone: 'Denoise done', msgDenoiseErr: 'Denoise error: ',
+    msgRetouching: 'Auto-retouching with Rust…', msgRetouchDone: 'Auto retouch done ✨', msgRetouchErr: 'Auto retouch error: ',
+    msgFilterOrig: 'Original filter — no change', msgFilterDone: 'Filter applied: ',
+    msgRotated: 'Rotated', msgEnterWH: 'Enter width and height',
+    msgResizing: 'Resizing with Rust…', msgResized: 'Resized to: ', msgResizeErr: 'Resize error: ',
+    msgBatchErr: 'Error in ', msgBatchDone: 'Batch resize finished: ', msgPhotos: ' photos',
+    msgTextHere: 'Text will go here — click “Add Text”',
+    msgClonePicked: 'Clone source picked — now paint on the target',
+    msgBackOriginal: 'Back to the original photo', msgCropCancel: 'Crop cancelled', msgFlatten: 'All layers flattened',
+    msgLayerAdded: 'Image layer added', msgDropImage: 'Drop an image file',
+  },
+};
+let currentLang = 'fa';
+function t(key) { return (I18N[currentLang] && I18N[currentLang][key]) || I18N.fa[key] || key; }
+function pct(n) { return n + (currentLang === 'fa' ? '٪' : '%'); }
+function applyLanguage(lang, save) {
+  if (!I18N[lang]) lang = 'fa';
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'fa' ? 'rtl' : 'ltr';
+  if (save !== false) { try { localStorage.setItem('mori-lang', lang); } catch (e) {} }
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (key.startsWith('menu')) {
+      if (el.dataset.fa === undefined) el.dataset.fa = el.childNodes[0].textContent.trim();
+      const span = el.querySelector('.menu-en');
+      if (lang === 'en') { el.childNodes[0].textContent = t(key) + ' '; if (span) span.style.display = 'none'; }
+      else { el.childNodes[0].textContent = el.dataset.fa + ' '; if (span) span.style.display = ''; }
+      return;
+    }
+    const v = t(key);
+    if (v !== undefined) el.textContent = v;
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => { el.placeholder = t(el.dataset.i18nPh); });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
+  document.querySelectorAll('.tool').forEach(b => {
+    const tool = b.dataset.tool;
+    const span = b.querySelector('span');
+    if (span && TOOL_NAMES[lang] && TOOL_NAMES[lang][tool]) span.textContent = TOOL_NAMES[lang][tool];
+    const en = b.querySelector('.en');
+    if (en) en.style.display = lang === 'en' ? 'none' : '';
+  });
+  $('langModal').hidden = true;
+  updateToolStatus();
+  $('toolTip').textContent = (TOOL_TIPS[lang] && TOOL_TIPS[lang][currentTool]) || '';
+  $('zoomLabel').textContent = Math.round(zoom * 100) + (lang === 'fa' ? '٪' : '%');
+  $('brushStrengthVal').textContent = pct(brushStrength);
+  const op = $('layerOpacity'); if (op) $('layerOpacityVal').textContent = pct(+op.value);
+}
+function showLangPicker() { $('langModal').hidden = false; }
+
 
 /* ---------- تاریخچه (Undo/Redo) ---------- */
 function snapshot() {
@@ -73,11 +226,11 @@ async function restoreSnapshot(snap) {
 }
 async function undo() {
   if (hIndex <= 0) return;
-  hIndex--; await restoreSnapshot(history[hIndex]); updateUndoButtons(); setMsg('واگرد انجام شد');
+  hIndex--; await restoreSnapshot(history[hIndex]); updateUndoButtons(); setMsg(t('msgUndo'));
 }
 async function redo() {
   if (hIndex >= history.length - 1) return;
-  hIndex++; await restoreSnapshot(history[hIndex]); updateUndoButtons(); setMsg('از نو انجام شد');
+  hIndex++; await restoreSnapshot(history[hIndex]); updateUndoButtons(); setMsg(t('msgRedo'));
 }
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -113,7 +266,7 @@ function render() {
     mctx.drawImage(l.canvas, l.x * zoom, l.y * zoom, l.canvas.width * zoom, l.canvas.height * zoom);
     mctx.restore();
   }
-  $('zoomLabel').textContent = Math.round(zoom * 100) + '٪';
+  $('zoomLabel').textContent = pct(Math.round(zoom * 100));
   $('statusSize').textContent = work.width + ' × ' + work.height + ' پیکسل' +
     (layers.length ? ' • ' + layers.length + ' لایه' : '');
 }
@@ -156,7 +309,7 @@ async function loadFromDataURL(dataUrl, name) {
   pushHistory();
   setZoom(0, true);
   renderLayersList();
-  setMsg('عکس باز شد: ' + currentFileName);
+  setMsg(t('msgOpened') + currentFileName);
 }
 async function openViaTauri() {
   const path = await tauriInvoke('open_image_dialog', {});
@@ -187,7 +340,7 @@ function downloadDataURL(dataUrl, filename) {
 }
 function baseName(name) { return name.replace(/\.[^.]+$/, '') || 'edited'; }
 async function saveAs() {
-  if (!hasImage) { setMsg('اول یک عکس باز کنید'); return; }
+  if (!hasImage) { setMsg(t('msgOpenFirst')); return; }
   const format = (currentFileName.split('.').pop() || 'png').toLowerCase();
   let dataUrl = compositeDataURL(format);
   const outName = baseName(currentFileName) + '.' + (format === 'jpeg' ? 'jpg' : format);
@@ -199,20 +352,20 @@ async function saveAs() {
     const path = await tauriInvoke('save_image_dialog', { defaultName: outName });
     if (!path) return;
     await tauriInvoke('save_image_data_url', { path, dataUrl });
-    setMsg('ذخیره شد: ' + path);
+    setMsg(t('msgSaved') + path);
   } catch (e) {
     if (format === 'bmp' || format === 'gif') {
       // در پیش‌نمایش مرورگر encoder برای BMP/GIF نیست؛ PNG ذخیره می‌شود
       downloadDataURL(dataUrl, baseName(currentFileName) + '.png');
-      setMsg('در مرورگر BMP/GIF پشتیبانی نمی‌شود؛ نسخه PNG دانلود شد');
+      setMsg(t('msgBmpGif'));
     } else {
       downloadDataURL(dataUrl, outName);
-      setMsg('دانلود شد: ' + outName);
+      setMsg(t('msgDownloaded') + outName);
     }
   }
 }
 async function saveQuick() {
-  if (!hasImage) { setMsg('اول یک عکس باز کنید'); return; }
+  if (!hasImage) { setMsg(t('msgOpenFirst')); return; }
   await saveAs();
 }
 
@@ -326,7 +479,7 @@ function paintBrushStroke(pos, prev) {
     } else if (currentTool === 'heal' || currentTool === 'object') {
       healAt(p, currentTool === 'object' ? 1.6 : 1);
     } else if (currentTool === 'clone') {
-      if (!cloneOffset) { setMsg('برای کلون اول Alt + کلیک کنید تا منبع انتخاب شود'); return; }
+      if (!cloneOffset) { setMsg(t('msgCloneSrc')); return; }
       // منبع را از snapshot ابتدای ضربه می‌خوانیم تا نقاشی، منبع را خراب نکند
       const srcCanvas = strokeSnapshot || t.canvas;
       paintFrom(srcCanvas, { x: p.x + cloneOffset.dx, y: p.y + cloneOffset.dy }, p, a);
@@ -497,7 +650,7 @@ function drawOverlay() {
   }
 }
 function applyCrop() {
-  if (!cropRect || cropRect.w < 4 || cropRect.h < 4) { setMsg('اول با ابزار برش یک مستطیل بکشید'); return; }
+  if (!cropRect || cropRect.w < 4 || cropRect.h < 4) { setMsg(t('msgCropFirst')); return; }
   const x = Math.max(0, Math.round(cropRect.x)), y = Math.max(0, Math.round(cropRect.y));
   const w = Math.min(work.width - x, Math.round(cropRect.w)), h = Math.min(work.height - y, Math.round(cropRect.h));
   const nc = document.createElement('canvas'); nc.width = w; nc.height = h;
@@ -511,12 +664,12 @@ function applyCrop() {
   }
   cropRect = null; drawOverlay();
   pushHistory(); setZoom(0, true); render();
-  setMsg('برش اعمال شد');
+  setMsg(t('msgCropDone'));
 }
 function applyTextLayer() {
-  if (!hasImage) { setMsg('اول یک عکس باز کنید'); return; }
+  if (!hasImage) { setMsg(t('msgOpenFirst')); return; }
   const text = $('textInput').value.trim();
-  if (!text) { setMsg('متن را بنویسید'); return; }
+  if (!text) { setMsg(t('msgWriteText')); return; }
   const size = parseInt($('textSize').value, 10) || 48;
   const c = document.createElement('canvas');
   c.width = work.width; c.height = work.height;
@@ -529,7 +682,7 @@ function applyTextLayer() {
   addLayer('متن: ' + text.slice(0, 20), 'text', c, 0, 0);
   textPos = null; drawOverlay();
   pushHistory();
-  setMsg('متن به‌عنوان لایه اضافه شد — با ابزار جابه‌جا می‌توانید آن را بکشید');
+  setMsg(t('msgTextAdded'));
 }
 
 /* ---------- تنظیم نور/رنگ (Rust + جایگزین JS) ---------- */
@@ -600,9 +753,9 @@ function jsAdjustPixels(dataUrl, v) {
   });
 }
 async function applyAdjust() {
-  if (!hasImage) { setMsg('اول یک عکس باز کنید'); return; }
+  if (!hasImage) { setMsg(t('msgOpenFirst')); return; }
   const v = adjValues();
-  setMsg('در حال اعمال با Rust…');
+  setMsg(t('msgApplying'));
   try {
     const flat = flattenToCanvas().toDataURL('image/png');
     let out;
@@ -616,8 +769,8 @@ async function applyAdjust() {
     await loadFromDataURLKeepHistory(out);
     mainCanvas.style.filter = '';
     resetAdjustSliders();
-    setMsg('تنظیم نور و رنگ اعمال شد');
-  } catch (e) { setMsg('خطا در اعمال تنظیمات: ' + e.message); }
+    setMsg(t('msgAdjustDone'));
+  } catch (e) { setMsg(t('msgAdjustErr') + e.message); }
 }
 // بارگذاری نتیجه روی لایه پایه بدون پاک کردن تاریخچه‌ی قبل، بعد pushHistory
 async function loadFromDataURLKeepHistory(dataUrl) {
@@ -630,7 +783,7 @@ async function loadFromDataURLKeepHistory(dataUrl) {
 async function applyLevels() {
   if (!hasImage) return;
   const black = +$('lvlBlack').value, white = +$('lvlWhite').value;
-  if (white <= black) { setMsg('نقطه سفید باید بزرگ‌تر از نقطه سیاه باشد'); return; }
+  if (white <= black) { setMsg(t('msgLevelsErr')); return; }
   const flat = flattenToCanvas();
   const ctx = flat.getContext('2d', { willReadFrequently: true });
   const im = ctx.getImageData(0, 0, flat.width, flat.height);
@@ -645,21 +798,21 @@ async function applyLevels() {
   const img = await loadImage(flat.toDataURL('image/png'));
   work.width = img.width; work.height = img.height;
   wctx.drawImage(img, 0, 0);
-  pushHistory(); render(); setMsg('سطوح رنگ اعمال شد');
+  pushHistory(); render(); setMsg(t('msgLevelsDone'));
 }
 async function applyGlow() {
   if (!hasImage) return;
   const amt = +$('glowAmt').value;
-  if (amt <= 0) { setMsg('مقدار درخشش را بیشتر کنید'); return; }
+  if (amt <= 0) { setMsg(t('msgGlowMore')); return; }
   flattenIntoBase();
   const glow = blurredCopyOf(work, 12);
   wctx.save(); wctx.globalCompositeOperation = 'screen';
   wctx.globalAlpha = amt / 100 * 0.7; wctx.drawImage(glow, 0, 0); wctx.restore();
-  pushHistory(); render(); setMsg('درخشش اعمال شد');
+  pushHistory(); render(); setMsg(t('msgGlowDone'));
 }
 async function applyDenoise() {
   if (!hasImage) return;
-  setMsg('در حال نویزگیری با Rust…');
+  setMsg(t('msgDenoising'));
   try {
     const flat = flattenToCanvas().toDataURL('image/png');
     let out;
@@ -667,13 +820,13 @@ async function applyDenoise() {
     catch (e) { out = await jsAdjustPixels(flat, { brightness: 0, contrast: 0, saturation: 0, warmth: 0, hue: 0, blur: 1.5, sharpen: 0 }); }
     flattenIntoBase();
     await loadFromDataURLKeepHistory(out);
-    setMsg('نویزگیری انجام شد');
-  } catch (e) { setMsg('خطا در نویزگیری: ' + e.message); }
+    setMsg(t('msgDenoiseDone'));
+  } catch (e) { setMsg(t('msgDenoiseErr') + e.message); }
 }
 async function applyAutoRetouch() {
   // روتوش خودکار با یک کلیک (مثل Facetune Enhance) — با Rust
-  if (!hasImage) { setMsg('اول یک عکس باز کنید'); return; }
-  setMsg('در حال روتوش خودکار با Rust…');
+  if (!hasImage) { setMsg(t('msgOpenFirst')); return; }
+  setMsg(t('msgRetouching'));
   try {
     const flat = flattenToCanvas().toDataURL('image/png');
     let out;
@@ -683,14 +836,14 @@ async function applyAutoRetouch() {
     }
     flattenIntoBase();
     await loadFromDataURLKeepHistory(out);
-    setMsg('روتوش خودکار انجام شد ✨');
-  } catch (e) { setMsg('خطا در روتوش خودکار: ' + e.message); }
+    setMsg(t('msgRetouchDone'));
+  } catch (e) { setMsg(t('msgRetouchErr') + e.message); }
 }
 async function applyFilter(name) {
-  if (!hasImage) { setMsg('اول یک عکس باز کنید'); return; }
+  if (!hasImage) { setMsg(t('msgOpenFirst')); return; }
   const flat = flattenToCanvas();
   const ctx = flat.getContext('2d', { willReadFrequently: true });
-  if (name === 'original') { setMsg('فیلتر اصلی — بدون تغییر'); return; }
+  if (name === 'original') { setMsg(t('msgFilterOrig')); return; }
   if (name === 'warm' || name === 'cool' || name === 'vivid') {
     const v = { brightness: 0, contrast: name === 'vivid' ? 15 : 5, saturation: name === 'vivid' ? 40 : 10,
       warmth: name === 'warm' ? 30 : name === 'cool' ? -30 : 0, hue: 0, blur: 0, sharpen: 0 };
@@ -719,7 +872,7 @@ async function applyFilter(name) {
     wctx.drawImage(img, 0, 0);
     pushHistory(); render();
   }
-  setMsg('فیلتر اعمال شد: ' + name);
+  setMsg(t('msgFilterDone') + name);
 }
 
 /* ---------- چرخش / چرخاندن / اندازه ---------- */
@@ -735,7 +888,7 @@ function rotateSafe(dir) {
   flattenIntoBase();
   work.width = h; work.height = w;
   wctx.clearRect(0, 0, h, w); wctx.drawImage(nc, 0, 0);
-  pushHistory(); setZoom(0, true); render(); setMsg('چرخش انجام شد');
+  pushHistory(); setZoom(0, true); render(); setMsg(t('msgRotated'));
 }
 function flip(horizontal) {
   if (!hasImage) return;
@@ -752,8 +905,8 @@ function flip(horizontal) {
 async function resizeCurrent() {
   if (!hasImage) return;
   const w = parseInt($('resizeW').value, 10), h = parseInt($('resizeH').value, 10);
-  if (!w || !h) { setMsg('عرض و ارتفاع را وارد کنید'); return; }
-  setMsg('در حال تغییر اندازه با Rust…');
+  if (!w || !h) { setMsg(t('msgEnterWH')); return; }
+  setMsg(t('msgResizing'));
   try {
     const flat = flattenToCanvas().toDataURL('image/png');
     let out;
@@ -767,8 +920,8 @@ async function resizeCurrent() {
     flattenIntoBase();
     await loadFromDataURLKeepHistory(out);
     setZoom(0, true);
-    setMsg('اندازه تغییر کرد: ' + w + ' × ' + h);
-  } catch (e) { setMsg('خطا در تغییر اندازه: ' + e.message); }
+    setMsg(t('msgResized') + w + ' × ' + h);
+  } catch (e) { setMsg(t('msgResizeErr') + e.message); }
 }
 async function batchResize() {
   const w = parseInt($('batchW').value, 10) || 1024, h = parseInt($('batchH').value, 10) || 1024;
@@ -799,9 +952,9 @@ async function batchResize() {
           downloadDataURL(out, name);
         }
         done++;
-      } catch (err) { setMsg('خطا در ' + f.name + ': ' + err.message); }
+      } catch (err) { setMsg(t('msgBatchErr') + f.name + ': ' + err.message); }
     }
-    setMsg('تغییر اندازه گروهی تمام شد: ' + done + ' عکس');
+    setMsg(t('msgBatchDone') + done + t('msgPhotos'));
     e.target.value = '';
   };
 }
@@ -824,7 +977,7 @@ mainCanvas.addEventListener('pointerdown', (e) => {
     cropStart = pos; cropRect = { x: pos.x, y: pos.y, w: 0, h: 0 };
     drawOverlay(); return;
   }
-  if (currentTool === 'text') { textPos = pos; drawOverlay(); setMsg('متن در اینجا قرار می‌گیرد — دکمه «افزودن متن» را بزنید'); return; }
+  if (currentTool === 'text') { textPos = pos; drawOverlay(); setMsg(t('msgTextHere')); return; }
   if (currentTool === 'redeye') { redeyeAt(pos); pushHistory(); render(); return; }
   if (currentTool === 'move') {
     const l = layers.find(x => x.id === activeLayerId);
@@ -834,7 +987,7 @@ mainCanvas.addEventListener('pointerdown', (e) => {
   if (BRUSH_TOOLS.includes(currentTool)) {
     if (currentTool === 'clone' && e.altKey) {
       pendingCloneSource = pos; cloneOffset = null;
-      setMsg('منبع کلون انتخاب شد — حالا روی مقصد بکشید');
+      setMsg(t('msgClonePicked'));
       return;
     }
     if (currentTool === 'clone' && pendingCloneSource) {
@@ -888,39 +1041,65 @@ mainCanvas.addEventListener('pointercancel', endStroke);
 mainCanvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
 /* ---------- انتخاب ابزار ---------- */
-const TOOL_NAMES = { move: 'جابه‌جا', skin: 'صاف پوست', heal: 'پاک لک', object: 'حذف شیء',
-  clone: 'کلون', liquify: 'تغییر فرم', smudge: 'محو کردن', dodge: 'روشن کن', burn: 'تیره کن',
-  blurBrush: 'تاری', sharpenBrush: 'وضوح', colorize: 'رنگی کن', redeye: 'چشم قرمز',
-  crop: 'برش', text: 'متن', whiten: 'سفید کن' };
+const TOOL_NAMES = {
+  fa: { move: 'جابه‌جا', skin: 'صاف پوست', heal: 'پاک لک', object: 'حذف شیء',
+    clone: 'کلون', liquify: 'تغییر فرم', smudge: 'محو کردن', dodge: 'روشن کن', burn: 'تیره کن',
+    blurBrush: 'تاری', sharpenBrush: 'وضوح', colorize: 'رنگی کن', redeye: 'چشم قرمز',
+    crop: 'برش', text: 'متن', whiten: 'سفید کن' },
+  en: { move: 'Move', skin: 'Glamour Skin', heal: 'Skin Cleaner', object: 'Healing Brush',
+    clone: 'Clone', liquify: 'Liquify', smudge: 'Smudge', dodge: 'Dodge', burn: 'Burn',
+    blurBrush: 'Blur', sharpenBrush: 'Sharpen', colorize: 'Colorize', redeye: 'Red Eye Removal',
+    crop: 'Crop', text: 'Text', whiten: 'Whiten' },
+};
 const TOOL_TIPS = {
-  move: 'لایه فعال را بکشید تا جابه‌جا شود.',
-  skin: 'روی پوست بکشید تا صاف و یکدست شود (Glamour Skin).',
-  heal: 'روی لک یا جوش کلیک کنید تا پاک شود.',
-  object: 'روی شیئی که می‌خواهید حذف شود بکشید.',
-  clone: 'Alt + کلیک روی منبع، بعد روی مقصد بکشید.',
-  liquify: 'بکشید تا فرم عکس جابه‌جا شود.',
-  smudge: 'بکشید تا پیکسل‌ها محو و کشیده شوند.',
-  dodge: 'روی ناحیه بکشید تا روشن‌تر شود.',
-  burn: 'روی ناحیه بکشید تا تیره‌تر شود.',
-  blurBrush: 'روی ناحیه بکشید تا تار شود.',
-  sharpenBrush: 'روی ناحیه بکشید تا واضح‌تر شود.',
-  colorize: 'با رنگ انتخاب‌شده روی ناحیه بکشید.',
-  redeye: 'روی چشم قرمز کلیک کنید.',
-  whiten: 'روی دندان یا چشم بکشید تا سفیدتر و روشن‌تر شود (Whiten).',
-  crop: 'مستطیل بکشید، بعد «اعمال برش» را بزنید.',
-  text: 'روی عکس کلیک کنید، بعد «افزودن متن» را بزنید.',
+  fa: {
+    move: 'لایه فعال را بکشید تا جابه‌جا شود.',
+    skin: 'روی پوست بکشید تا صاف و یکدست شود (Glamour Skin).',
+    heal: 'روی لک یا جوش کلیک کنید تا پاک شود.',
+    whiten: 'روی دندان یا چشم بکشید تا سفیدتر و روشن‌تر شود (Whiten).',
+    object: 'روی شیئی که می‌خواهید حذف شود بکشید.',
+    clone: 'Alt + کلیک روی منبع، بعد روی مقصد بکشید.',
+    liquify: 'بکشید تا فرم عکس جابه‌جا شود.',
+    smudge: 'بکشید تا پیکسل‌ها محو و کشیده شوند.',
+    dodge: 'روی ناحیه بکشید تا روشن‌تر شود.',
+    burn: 'روی ناحیه بکشید تا تیره‌تر شود.',
+    blurBrush: 'روی ناحیه بکشید تا تار شود.',
+    sharpenBrush: 'روی ناحیه بکشید تا واضح‌تر شود.',
+    colorize: 'با رنگ انتخاب‌شده روی ناحیه بکشید.',
+    redeye: 'روی چشم قرمز کلیک کنید.',
+    crop: 'مستطیل بکشید، بعد «اعمال برش» را بزنید.',
+    text: 'روی عکس کلیک کنید، بعد «افزودن متن» را بزنید.',
+  },
+  en: {
+    move: 'Drag the active layer to move it.',
+    skin: 'Paint over skin to smooth it (Glamour Skin).',
+    heal: 'Click a blemish or pimple to remove it.',
+    whiten: 'Paint over teeth or eyes to whiten and brighten them (Whiten).',
+    object: 'Paint over the object you want to remove.',
+    clone: 'Alt + Click the source, then paint.',
+    liquify: 'Drag to push the photo shape.',
+    smudge: 'Drag to smear the pixels.',
+    dodge: 'Paint to brighten the area.',
+    burn: 'Paint to darken the area.',
+    blurBrush: 'Paint to blur the area.',
+    sharpenBrush: 'Paint to sharpen the area.',
+    colorize: 'Paint with the chosen color.',
+    redeye: 'Click a red eye.',
+    crop: 'Draw a rectangle, then click “Apply Crop”.',
+    text: 'Click the photo, then click “Add Text”.',
+  },
 };
 function updateToolStatus() {
-  const name = TOOL_NAMES[currentTool] || currentTool;
+  const name = (TOOL_NAMES[currentLang] && TOOL_NAMES[currentLang][currentTool]) || currentTool;
   const isBrush = BRUSH_TOOLS.includes(currentTool) || currentTool === 'redeye';
-  setToolLabel(isBrush ? name + ' • قلم ' + brushSize + ' پیکسل' : name);
+  setToolLabel(isBrush ? (currentLang === 'fa' ? name + ' • قلم ' + brushSize + ' پیکسل' : name + ' • Brush ' + brushSize + 'px') : name);
 }
 function setTool(tool) {
   currentTool = tool;
   cropRect = null; textPos = null; drawOverlay();
   document.querySelectorAll('.tool').forEach(b => b.classList.toggle('active', b.dataset.tool === tool));
   updateToolStatus();
-  $('toolTip').textContent = TOOL_TIPS[tool] || '';
+  $('toolTip').textContent = (TOOL_TIPS[currentLang] && TOOL_TIPS[currentLang][tool]) || '';
   // نشانگر هیچ‌وقت نامرئی نمی‌شود: برای ابزارهای قلمی crosshair + دایره پیش‌نمایش
   mainCanvas.style.cursor = tool === 'move' ? 'move' : 'crosshair';
 }
@@ -932,6 +1111,9 @@ function closeAbout() { $('aboutModal').hidden = true; }
 $('btnAbout').onclick = openAbout;
 $('menuHelp').onclick = openAbout;
 $('aboutClose').onclick = closeAbout;
+$('btnLang').onclick = showLangPicker;
+$('langFa').onclick = () => applyLanguage('fa');
+$('langEn').onclick = () => applyLanguage('en');
 $('aboutModal').addEventListener('click', (e) => { if (e.target === $('aboutModal')) closeAbout(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAbout(); });
 
@@ -944,13 +1126,13 @@ $('btnRedo').onclick = redo;
 $('btnReset').onclick = async () => {
   if (!history.length) return;
   hIndex = 0; await restoreSnapshot(history[0]); updateUndoButtons();
-  resetAdjustSliders(); setMsg('به عکس اصلی برگشت');
+  resetAdjustSliders(); setMsg(t('msgBackOriginal'));
 };
 $('zoomIn').onclick = () => setZoom(zoom * 1.25);
 $('zoomOut').onclick = () => setZoom(zoom / 1.25);
 $('zoomFit').onclick = () => setZoom(0, true);
 $('brushSize').oninput = (e) => { brushSize = +e.target.value; $('brushSizeVal').textContent = brushSize; updateToolStatus(); drawOverlay(); };
-$('brushStrength').oninput = (e) => { brushStrength = +e.target.value; $('brushStrengthVal').textContent = brushStrength + '٪'; };
+$('brushStrength').oninput = (e) => { brushStrength = +e.target.value; $('brushStrengthVal').textContent = pct(brushStrength); };
 $('brushColor').oninput = (e) => { brushColor = e.target.value; };
 ['adjBright', 'adjContrast', 'adjSat', 'adjWarm', 'adjHue', 'adjBlur', 'adjSharp'].forEach(id => {
   const el = $(id); if (el) el.addEventListener('input', updateAdjustLabels);
@@ -979,12 +1161,12 @@ $('resizeH').onchange = () => {
   }
 };
 $('btnCropApply').onclick = applyCrop;
-$('btnCropCancel').onclick = () => { cropRect = null; drawOverlay(); setMsg('برش لغو شد'); };
+$('btnCropCancel').onclick = () => { cropRect = null; drawOverlay(); setMsg(t('msgCropCancel')); };
 $('btnTextApply').onclick = applyTextLayer;
 $('btnAddLayerImg').onclick = () => $('layerInput').click();
-$('btnFlatten').onclick = () => { if (!hasImage) return; flattenIntoBase(); pushHistory(); render(); setMsg('همه لایه‌ها ادغام شد'); };
+$('btnFlatten').onclick = () => { if (!hasImage) return; flattenIntoBase(); pushHistory(); render(); setMsg(t('msgFlatten')); };
 $('layerOpacity').oninput = (e) => {
-  $('layerOpacityVal').textContent = e.target.value + '٪';
+  $('layerOpacityVal').textContent = pct(+e.target.value);
   const l = layers.find(x => x.id === activeLayerId);
   if (l) { l.opacity = e.target.value / 100; render(); }
 };
@@ -1016,14 +1198,14 @@ $('layerInput').onchange = async (e) => {
   c.getContext('2d').drawImage(img, 0, 0, img.width * scale, img.height * scale);
   addLayer('عکس: ' + f.name.slice(0, 20), 'image', c, 0, 0);
   pushHistory();
-  setMsg('لایه عکس اضافه شد');
+  setMsg(t('msgLayerAdded'));
   e.target.value = '';
 };
 ['dragover', 'dragenter'].forEach(ev => canvasWrap.addEventListener(ev, (e) => { e.preventDefault(); }));
 canvasWrap.addEventListener('drop', async (e) => {
   e.preventDefault();
   const f = e.dataTransfer.files && e.dataTransfer.files[0];
-  if (!f || !f.type.startsWith('image/')) { setMsg('فایل عکس را رها کنید'); return; }
+  if (!f || !f.type.startsWith('image/')) { setMsg(t('msgDropImage')); return; }
   const dataUrl = await new Promise((res, rej) => {
     const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f);
   });
@@ -1053,3 +1235,10 @@ document.addEventListener('keydown', (e) => {
   }
   render();
 })();
+
+/* ---------- زبان: اول برنامه بپرس، بعد یادت باشد ---------- */
+try {
+  const savedLang = localStorage.getItem('mori-lang');
+  if (savedLang === 'en' || savedLang === 'fa') applyLanguage(savedLang, false);
+  else { applyLanguage('fa', false); showLangPicker(); }
+} catch (e) { applyLanguage('fa', false); showLangPicker(); }
