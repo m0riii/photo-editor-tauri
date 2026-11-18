@@ -1,0 +1,74 @@
+name: Extract v1.0.4 project zip
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Unzip v1.0.4 project
+        run: |
+          ls -la
+          unzip -o photo-editor-tauri-v104.zip -d /tmp/extracted
+          echo "--- extracted top level ---"
+          ls -la /tmp/extracted
+          echo "--- extracted tree ---"
+          find /tmp/extracted -maxdepth 3 | head -n 120
+      - name: Copy extracted files into repo root
+        run: |
+          if [ -f /tmp/extracted/package.json ]; then
+            cp -a /tmp/extracted/. ./
+          fi
+          for d in photo-editor-tauri photo-editor-tauri-v104 photo-editor-v104; do
+            if [ -d "/tmp/extracted/$d" ]; then
+              cp -a "/tmp/extracted/$d/." ./
+            fi
+          done
+          if [ ! -f package.json ]; then
+            for d in /tmp/extracted/*/; do
+              if [ -f "$d/package.json" ]; then cp -a "$d/." ./; fi
+            done
+          fi
+          echo "--- repo root after copy ---"
+          ls -la
+          echo "--- file count ---"
+          find . -path ./.git -prune -o -type f -print | sort
+      - name: Verify v1.0.4 contents
+        run: |
+          test -f package.json
+          test -f src-tauri/Cargo.toml
+          test -f src-tauri/tauri.conf.json
+          grep -q '1.0.4' package.json
+          grep -q '1.0.4' src-tauri/Cargo.toml
+          grep -q '1.0.4' src-tauri/tauri.conf.json
+          grep -q 'Mori Instrument' src-tauri/tauri.conf.json
+          grep -q 'Graphics and Design' src-tauri/tauri.conf.json
+          grep -q 'icon.ico' src-tauri/tauri.conf.json
+          grep -q 'permissions:' .github/workflows/build-windows.yml
+          grep -q 'contents: write' .github/workflows/build-windows.yml
+          grep -q 'permissions:' .github/workflows/build-macos.yml
+          grep -q 'contents: write' .github/workflows/build-macos.yml
+          grep -rq 'flex-shrink' src/
+          ls src/fonts/
+          grep -q 'auto_retouch_image' src-tauri/src/main.rs
+          test "$(grep -c 'auto_retouch_image' src-tauri/src/main.rs)" -ge 2
+          grep -q 'generate_handler' src-tauri/src/main.rs
+          grep -rq 'btnAutoRetouch' src/
+          grep -rq 'whitenAt' src/
+          echo "tauri.conf.json:"
+          cat src-tauri/tauri.conf.json
+      - name: Commit extracted v1.0.4 files
+        run: |
+          rm -f photo-editor-tauri-v104.zip
+          git config user.name "m0riii"
+          git config user.email "mori.jacobi@gmail.com"
+          git add -A
+          git status --short
+          git commit -m "Update photo editor to v1.0.4" || echo "nothing to commit"
+          git push origin main
