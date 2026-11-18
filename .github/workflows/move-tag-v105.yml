@@ -1,0 +1,31 @@
+name: Move tag v1.0.5 to fixed commit
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "Commit SHA to point v1.0.5 at"
+        required: true
+        default: "3e7ae00"
+
+jobs:
+  move-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Move tag v1.0.5
+        run: |
+          git config user.name "m0riii"
+          git config user.email "mori.jacobi@gmail.com"
+          git fetch --tags --force
+          git tag -f v1.0.5 ${{ inputs.commit }}
+          git push --force origin v1.0.5
+          echo "--- v1.0.5 now points at ---"
+          git rev-parse v1.0.5
+          git log -1 --oneline v1.0.5
