@@ -1,0 +1,56 @@
+name: Build macOS dmg (Tauri)
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to attach the macOS dmg to (e.g. v1.0.2)"
+        required: true
+        default: "v1.0.2"
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Setup Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Tauri app (macOS Apple Silicon)
+        run: npm run build -- --target aarch64-apple-darwin
+
+      - name: Upload dmg
+        uses: actions/upload-artifact@v4
+        with:
+          name: photo-editor-macos
+          path: src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
+          if-no-files-found: error
+
+      - name: Attach dmg to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag }}
+          files: src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg
