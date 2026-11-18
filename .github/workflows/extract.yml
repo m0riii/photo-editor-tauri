@@ -2,7 +2,6 @@ name: Extract v1.0.3 project zip
 
 permissions:
   contents: write
-  workflows: write
 
 on:
   workflow_dispatch:
@@ -55,9 +54,15 @@ jobs:
           grep -rq 'Mori J' src/ || true
           echo "tauri.conf.json:"
           cat src-tauri/tauri.conf.json
+          echo "--- diff of zip workflow files vs repo workflow files (before restore) ---"
+          diff -u .github/workflows/build-windows.yml /tmp/extracted/.github/workflows/build-windows.yml || true
+          diff -u .github/workflows/build-macos.yml /tmp/extracted/.github/workflows/build-macos.yml || true
+          echo "--- extracted workflow files ---"
+          ls -la /tmp/extracted/.github/workflows/ || ls -la /tmp/extracted/photo-editor-tauri-v103/.github/workflows/ || ls -la /tmp/extracted/photo-editor-tauri/.github/workflows/ || true
       - name: Commit extracted v1.0.3 files
         run: |
-          rm -rf photo-editor-tauri-v103.zip .github/workflows/extract.yml /tmp/extracted
+          rm -f photo-editor-tauri-v103.zip
+          git checkout -- .github/workflows
           git config user.name "m0riii"
           git config user.email "mori.jacobi@gmail.com"
           git add -A
