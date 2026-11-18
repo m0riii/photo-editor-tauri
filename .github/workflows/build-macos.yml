@@ -40,7 +40,23 @@ jobs:
         run: npm ci
 
       - name: Build Tauri app (macOS Apple Silicon)
-        run: npm run build -- --target aarch64-apple-darwin
+        run: npm run build -- --target aarch64-apple-darwin --bundles dmg
+
+      - name: List bundle outputs
+        run: |
+          echo "--- bundle tree ---"
+          find src-tauri/target -path '*bundle*' \( -name '*.dmg' -o -name '*.app' \) -print 2>/dev/null | head -20
+          ls -R src-tauri/target/aarch64-apple-darwin/release/bundle 2>/dev/null || ls -R src-tauri/target/release/bundle 2>/dev/null || echo "no bundle dir"
+
+      - name: Create dmg from app if Tauri did not make one
+        run: |
+          if ls src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/*.dmg 1> /dev/null 2>&1; then
+            echo "dmg already exists"
+          else
+            mkdir -p src-tauri/target/aarch64-apple-darwin/release/bundle/dmg
+            hdiutil create -volname "Mori Instrument" -srcfolder "src-tauri/target/aarch64-apple-darwin/release/bundle/macos/Mori Instrument.app" -ov -format UDZO "src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/Mori Instrument_1.0.5_aarch64.dmg"
+            ls -la src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/
+          fi
 
       - name: Upload dmg
         uses: actions/upload-artifact@v4
