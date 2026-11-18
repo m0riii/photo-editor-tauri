@@ -1,6 +1,4 @@
 name: Build Windows exe (Tauri)
-permissions:
-  contents: write
 
 on:
   push:

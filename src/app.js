@@ -19,6 +19,7 @@ let brushSize = 60, brushStrength = 50, brushColor = '#ff5a5a';
 let zoom = 1, hasImage = false;
 let history = [], hIndex = -1;
 let isDrawing = false, lastPos = null, strokeSnapshot = null, cloneOffset = null;
+let mousePos = null; // موقعیت نشانگر روی عکس (مختصات تصویر) برای پیش‌نمایش دایره قلم
 let cropRect = null, cropStart = null, textPos = null, dragLayer = null;
 let blurredCache = null, sharpenedCache = null, cacheFor = null;
 
@@ -452,6 +453,21 @@ function drawOverlay() {
     octx.fillText($('textInput').value || '', textPos.x * zoom, textPos.y * zoom);
     octx.restore();
   }
+  // پیش‌نمایش زنده قلم: دایره‌ای به اندازه قلم روی بوم overlay (نه روی عکس)
+  // تا نشانگر هیچ‌وقت نامرئی نماند و محل اثر قلم دیده شود.
+  if (mousePos && hasImage && (BRUSH_TOOLS.includes(currentTool) || currentTool === 'redeye')) {
+    const r = (currentTool === 'redeye' ? Math.max(10, brushSize / 4) : brushSize / 2) * zoom;
+    const cx = mousePos.x * zoom, cy = mousePos.y * zoom;
+    octx.save();
+    octx.beginPath(); octx.arc(cx, cy, Math.max(2, r), 0, Math.PI * 2);
+    octx.strokeStyle = 'rgba(0,0,0,0.85)'; octx.lineWidth = 3.5; octx.stroke();
+    octx.beginPath(); octx.arc(cx, cy, Math.max(2, r), 0, Math.PI * 2);
+    octx.strokeStyle = 'rgba(255,255,255,0.95)'; octx.lineWidth = 1.5; octx.stroke();
+    octx.beginPath(); octx.arc(cx, cy, 1.8, 0, Math.PI * 2);
+    octx.fillStyle = '#fff'; octx.fill();
+    octx.strokeStyle = 'rgba(0,0,0,0.85)'; octx.lineWidth = 1; octx.stroke();
+    octx.restore();
+  }
 }
 function applyCrop() {
   if (!cropRect || cropRect.w < 4 || cropRect.h < 4) { setMsg('اول با ابزار برش یک مستطیل بکشید'); return; }
@@ -787,11 +803,13 @@ mainCanvas.addEventListener('pointerdown', (e) => {
     blurredCache = null; sharpenedCache = null; cacheFor = null;
     paintBrushStroke(pos, null);
     render();
+    drawOverlay();
   }
 });
 mainCanvas.addEventListener('pointermove', (e) => {
   if (!hasImage) return;
   const pos = toImagePos(e);
+  mousePos = pos; // موقعیت نشانگر را همیشه دنبال کن، حتی وقتی نقاشی نمی‌کنیم
   if (currentTool === 'crop' && cropStart) {
     cropRect = { x: Math.min(cropStart.x, pos.x), y: Math.min(cropStart.y, pos.y),
       w: Math.abs(pos.x - cropStart.x), h: Math.abs(pos.y - cropStart.y) };
@@ -807,8 +825,12 @@ mainCanvas.addEventListener('pointermove', (e) => {
     else paintBrushStroke(pos, lastPos);
     lastPos = pos;
     render();
+    drawOverlay(); // دایره پیش‌نمایش قلم را همراه نشانگر حرکت بده
+  } else if (BRUSH_TOOLS.includes(currentTool) || currentTool === 'redeye') {
+    drawOverlay(); // شناور بودن روی عکس: فقط پیش‌نمایش را تازه کن، بدون نقاشی
   }
 });
+mainCanvas.addEventListener('pointerleave', () => { mousePos = null; drawOverlay(); });
 function endStroke() {
   if (isDrawing) {
     isDrawing = false; strokeSnapshot = null;
@@ -844,13 +866,19 @@ const TOOL_TIPS = {
   crop: 'مستطیل بکشید، بعد «اعمال برش» را بزنید.',
   text: 'روی عکس کلیک کنید، بعد «افزودن متن» را بزنید.',
 };
+function updateToolStatus() {
+  const name = TOOL_NAMES[currentTool] || currentTool;
+  const isBrush = BRUSH_TOOLS.includes(currentTool) || currentTool === 'redeye';
+  setToolLabel(isBrush ? name + ' • قلم ' + brushSize + ' پیکسل' : name);
+}
 function setTool(tool) {
   currentTool = tool;
   cropRect = null; textPos = null; drawOverlay();
   document.querySelectorAll('.tool').forEach(b => b.classList.toggle('active', b.dataset.tool === tool));
-  setToolLabel(TOOL_NAMES[tool] || tool);
+  updateToolStatus();
   $('toolTip').textContent = TOOL_TIPS[tool] || '';
-  mainCanvas.style.cursor = tool === 'move' ? 'move' : tool === 'crop' || tool === 'text' ? 'crosshair' : 'none';
+  // نشانگر هیچ‌وقت نامرئی نمی‌شود: برای ابزارهای قلمی crosshair + دایره پیش‌نمایش
+  mainCanvas.style.cursor = tool === 'move' ? 'move' : 'crosshair';
 }
 document.querySelectorAll('.tool').forEach(b => b.addEventListener('click', () => setTool(b.dataset.tool)));
 
@@ -868,7 +896,7 @@ $('btnReset').onclick = async () => {
 $('zoomIn').onclick = () => setZoom(zoom * 1.25);
 $('zoomOut').onclick = () => setZoom(zoom / 1.25);
 $('zoomFit').onclick = () => setZoom(0, true);
-$('brushSize').oninput = (e) => { brushSize = +e.target.value; $('brushSizeVal').textContent = brushSize; };
+$('brushSize').oninput = (e) => { brushSize = +e.target.value; $('brushSizeVal').textContent = brushSize; updateToolStatus(); drawOverlay(); };
 $('brushStrength').oninput = (e) => { brushStrength = +e.target.value; $('brushStrengthVal').textContent = brushStrength + '٪'; };
 $('brushColor').oninput = (e) => { brushColor = e.target.value; };
 ['adjBright', 'adjContrast', 'adjSat', 'adjWarm', 'adjHue', 'adjBlur', 'adjSharp'].forEach(id => {
