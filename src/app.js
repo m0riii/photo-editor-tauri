@@ -882,6 +882,15 @@ function setTool(tool) {
 }
 document.querySelectorAll('.tool').forEach(b => b.addEventListener('click', () => setTool(b.dataset.tool)));
 
+/* ---------- پنجره درباره برنامه ---------- */
+function openAbout() { $('aboutModal').hidden = false; }
+function closeAbout() { $('aboutModal').hidden = true; }
+$('btnAbout').onclick = openAbout;
+$('menuHelp').onclick = openAbout;
+$('aboutClose').onclick = closeAbout;
+$('aboutModal').addEventListener('click', (e) => { if (e.target === $('aboutModal')) closeAbout(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAbout(); });
+
 /* ---------- اتصال دکمه‌ها ---------- */
 $('btnOpen').onclick = openImage;
 $('btnSave').onclick = saveQuick;

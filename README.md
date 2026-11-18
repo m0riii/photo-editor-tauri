@@ -1,4 +1,4 @@
-# ویرایشگر عکس — Rust + Tauri
+# Mori Instrument — Rust + Tauri
 
 ویرایشگر و روتوش عکس برای ویندوز، الهام‌گرفته از **PhotoInstrument**
 (https://www.photoinstrument.com/) — با موتور Rust و رابط Tauri v2.

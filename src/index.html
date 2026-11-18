@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ویرایشگر عکس — Photo Editor</title>
+<title>Mori Instrument</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,8 +11,8 @@
 <!-- نوار عنوان روشن، مثل PhotoInstrument 7.7 -->
 <header class="titlebar">
   <span class="logo">📷</span>
-  <strong>ویرایشگر عکس</strong>
-  <small>PhotoInstrument style • Rust + Tauri • نسخه ۱٫۰٫۱</small>
+  <strong>Mori Instrument</strong>
+  <small>PhotoInstrument style • Rust + Tauri • نسخه ۱٫۰٫۳</small>
 </header>
 
 <!-- نوار منوی تیره: File / Edit / Plugins / Options / Help -->
@@ -21,7 +21,7 @@
   <button type="button" class="menu-item">ویرایش <span class="menu-en">Edit</span></button>
   <button type="button" class="menu-item">پلاگین‌ها <span class="menu-en">Plugins</span></button>
   <button type="button" class="menu-item">گزینه‌ها <span class="menu-en">Options</span></button>
-  <button type="button" class="menu-item">راهنما <span class="menu-en">Help</span></button>
+  <button type="button" class="menu-item" id="menuHelp">راهنما <span class="menu-en">Help</span></button>
 </nav>
 
 <!-- ردیف ابزار دوم: فایل، Original، واگرد/ازنو، زوم، Apply، پیش‌نمایش -->
@@ -41,6 +41,7 @@
     <button id="zoomFit" class="btn small">متناسب</button>
   </div>
   <button id="btnApplyAdjust" class="btn primary">✓ Apply — اعمال (Rust)</button>
+  <button id="btnAbout" class="btn" title="درباره برنامه">ℹ️ درباره</button>
   <div class="thumb-preview" title="پیش‌نمایش عکس">
     <span>پیش‌نمایش</span>
   </div>
@@ -157,7 +158,7 @@
         <label>متن <input type="text" id="textInput" placeholder="متن را اینجا بنویسید" value="سلام دنیا"></label>
         <label>اندازه <input type="number" id="textSize" min="10" max="300" value="48"></label>
         <label>رنگ <input type="color" id="textColor" value="#ffffff"></label>
-        <label>فونت <select id="textFont"><option value="Vazirmatn, Tahoma, sans-serif">وزیرمتن / Tahoma</option><option value="serif">Serif</option><option value="sans-serif">Sans</option><option value="monospace">Monospace</option></select></label>
+        <label>فونت <select id="textFont"><option value="Vazir, Tahoma, sans-serif">وزیر (Vazir)</option><option value="serif">Serif</option><option value="sans-serif">Sans</option><option value="monospace">Monospace</option></select></label>
         <button id="btnTextApply" class="btn primary">✓ افزودن متن به‌عنوان لایه</button>
         <p class="tip">بعد از افزودن، متن را با ابزار «جابه‌جا» می‌توانید بکشید.</p>
       </details>
@@ -204,6 +205,19 @@
     </div>
   </section>
 </main>
+
+<!-- پنجره درباره برنامه -->
+<div id="aboutModal" class="modal" hidden>
+  <div class="modal-card">
+    <div class="about-logo">📷</div>
+    <h2>Mori Instrument</h2>
+    <p class="about-ver">نسخه ۱٫۰٫۳ • Rust + Tauri</p>
+    <p>ساخته شده توسط Mori J</p>
+    <p>ایده از برنامه PhotoInstrument</p>
+    <p class="about-link">photoinstrument.com</p>
+    <button id="aboutClose" class="btn primary">بستن</button>
+  </div>
+</div>
 
 <input type="file" id="fileInput" accept="image/*" hidden>
 <input type="file" id="batchInput" accept="image/*" multiple hidden>

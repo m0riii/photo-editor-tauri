@@ -1,7 +1,7 @@
 [package]
 name = "photo-editor"
-version = "1.0.2"
-description = "ویرایشگر عکس ویندوزی با Rust + Tauri — الهام‌گرفته از PhotoInstrument"
+version = "1.0.3"
+description = "Mori Instrument - Persian photo editor built with Rust + Tauri, like PhotoInstrument"
 authors = ["Mori"]
 edition = "2021"
 

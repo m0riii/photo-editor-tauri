@@ -1,5 +1,5 @@
 {
-  "description": "ویرایشگر عکس ویندوزی با Rust + Tauri — الهام‌گرفته از PhotoInstrument",
+  "description": "Mori Instrument - Persian photo editor built with Rust + Tauri, like PhotoInstrument",
   "devDependencies": {
     "@tauri-apps/api": "^2.0.0",
     "@tauri-apps/cli": "^2.0.0"
@@ -12,5 +12,5 @@
     "tauri": "tauri"
   },
   "type": "module",
-  "version": "1.0.2"
+  "version": "1.0.3"
 }
