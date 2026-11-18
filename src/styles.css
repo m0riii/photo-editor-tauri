@@ -28,6 +28,7 @@ button{font-family:inherit;cursor:pointer}
 /* چیدمان اصلی: ستون کناری سمت چپ، بوم سمت راست (مثل اسکرین‌شات) */
 .layout{flex:1;display:flex;min-height:0;direction:ltr}
 .sidebar{width:320px;min-width:320px;direction:rtl;background:var(--panel);border-inline-end:1px solid var(--line);overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px}
+.sidebar>*{flex-shrink:0}
 .section-header{background:linear-gradient(180deg,var(--header1),var(--header2));color:#fff;font-weight:700;font-size:13px;text-align:center;padding:6px 8px;border-radius:4px 4px 0 0}
 /* شبکه ابزارها — سفید، مثل پنل Instruments */
 .instruments{background:#fff;border:1px solid var(--line);border-radius:4px;overflow:hidden}
