@@ -1,0 +1,33 @@
+name: Diagnose and fix icon
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fix-icon:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PUSH_TOKEN }}
+      - name: Inspect icons
+        run: |
+          ls -l src-tauri/icons/
+          file src-tauri/icons/*
+          python3 -c "import pathlib; print(pathlib.Path('src-tauri/icons/icon.ico').read_bytes()[:16])"
+          python3 -c "import pathlib; print(pathlib.Path('src-tauri/icons/icon.png').read_bytes()[:16])"
+      - name: Regenerate ICO from PNG
+        run: |
+          pip install -q pillow
+          python3 -c "from PIL import Image; img=Image.open('src-tauri/icons/icon.png').convert('RGBA'); img.save('src-tauri/icons/icon.ico', format='ICO', sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])"
+          ls -l src-tauri/icons/
+          file src-tauri/icons/icon.ico
+      - name: Commit fixed icon and remove this workflow
+        run: |
+          rm -f .github/workflows/fix-icon.yml
+          git config user.name "m0riii"
+          git config user.email "mori.jacobi@gmail.com"
+          git add -A
+          git status --short
+          git commit -m "Regenerate icon.ico from icon.png for MSI bundler" || echo "nothing to commit"
+          git push
