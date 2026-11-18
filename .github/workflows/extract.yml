@@ -1,0 +1,65 @@
+name: Extract v1.0.3 project zip
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Unzip v1.0.3 project
+        run: |
+          ls -la
+          unzip -o photo-editor-tauri-v103.zip -d /tmp/extracted
+          echo "--- extracted top level ---"
+          ls -la /tmp/extracted
+          echo "--- extracted tree ---"
+          find /tmp/extracted -maxdepth 3 | head -n 120
+      - name: Copy extracted files into repo root
+        run: |
+          if [ -f /tmp/extracted/package.json ]; then
+            cp -a /tmp/extracted/. ./
+          fi
+          for d in photo-editor-tauri photo-editor-tauri-v103 photo-editor-v103; do
+            if [ -d "/tmp/extracted/$d" ]; then
+              cp -a "/tmp/extracted/$d/." ./
+            fi
+          done
+          echo "--- repo root after copy ---"
+          ls -la
+          echo "--- file count ---"
+          find . -path ./.git -prune -o -type f -print | sort
+      - name: Verify v1.0.3 contents
+        run: |
+          test -f package.json
+          test -f src-tauri/Cargo.toml
+          test -f src-tauri/tauri.conf.json
+          grep -q '1.0.3' package.json
+          grep -q '1.0.3' src-tauri/Cargo.toml
+          grep -q '1.0.3' src-tauri/tauri.conf.json
+          grep -q 'Mori Instrument' src-tauri/tauri.conf.json
+          grep -q 'Graphics and Design' src-tauri/tauri.conf.json
+          grep -q 'icon.ico' src-tauri/tauri.conf.json
+          grep -q 'permissions:' .github/workflows/build-windows.yml
+          grep -q 'contents: write' .github/workflows/build-windows.yml
+          grep -q 'permissions:' .github/workflows/build-macos.yml
+          grep -q 'contents: write' .github/workflows/build-macos.yml
+          grep -rq 'flex-shrink:0' src/ || grep -rq 'flex-shrink: 0' src/ || grep -rq 'flex-shrink' src/
+          ls src/fonts/
+          grep -rq 'Mori J' src/ || true
+          echo "tauri.conf.json:"
+          cat src-tauri/tauri.conf.json
+      - name: Commit extracted v1.0.3 files
+        run: |
+          rm -rf photo-editor-tauri-v103.zip .github/workflows/extract.yml /tmp/extracted
+          git config user.name "m0riii"
+          git config user.email "mori.jacobi@gmail.com"
+          git add -A
+          git status --short
+          git commit -m "Update photo editor to v1.0.3" || echo "nothing to commit"
+          git push origin main
