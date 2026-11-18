@@ -349,6 +349,8 @@ function paintBrushStroke(pos, prev) {
       t.ctx.fillStyle = g;
       t.ctx.beginPath(); t.ctx.arc(p.x, p.y, r, 0, Math.PI * 2); t.ctx.fill();
       t.ctx.restore();
+    } else if (currentTool === 'whiten') {
+      whitenAt(p);
     }
   }
 }
@@ -362,6 +364,31 @@ function interpolate(a, b, step) {
 function hexA(hex, alpha) {
   const n = parseInt(hex.slice(1), 16);
   return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + alpha + ')';
+}
+function whitenAt(pos) {
+  // سفید کردن دندان / روشن کردن چشم (Whiten — مثل Facetune): کم‌رنگ + روشن به سمت سفید
+  const t = activeTarget();
+  const r = brushSize / 2;
+  const x0 = Math.max(0, Math.floor(pos.x - r)), y0 = Math.max(0, Math.floor(pos.y - r));
+  const x1 = Math.min(t.canvas.width, Math.ceil(pos.x + r)), y1 = Math.min(t.canvas.height, Math.ceil(pos.y + r));
+  if (x1 <= x0 || y1 <= y0) return;
+  const im = t.ctx.getImageData(x0, y0, x1 - x0, y1 - y0);
+  const d = im.data, a = brushStrength / 100;
+  for (let y = y0; y < y1; y++) {
+    for (let x = x0; x < x1; x++) {
+      const dist = Math.hypot(x - pos.x, y - pos.y) / r;
+      if (dist > 1) continue;
+      const wgt = (1 - dist * dist) * a * 0.5;
+      const i = ((y - y0) * (x1 - x0) + (x - x0)) * 4;
+      const gray = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+      for (let c = 0; c < 3; c++) {
+        let v = gray + (d[i + c] - gray) * 0.7;
+        v = v + (255 - v) * wgt;
+        d[i + c] = v;
+      }
+    }
+  }
+  t.ctx.putImageData(im, x0, y0);
 }
 function healAt(pos, scale) {
   const t = activeTarget();
@@ -643,6 +670,22 @@ async function applyDenoise() {
     setMsg('نویزگیری انجام شد');
   } catch (e) { setMsg('خطا در نویزگیری: ' + e.message); }
 }
+async function applyAutoRetouch() {
+  // روتوش خودکار با یک کلیک (مثل Facetune Enhance) — با Rust
+  if (!hasImage) { setMsg('اول یک عکس باز کنید'); return; }
+  setMsg('در حال روتوش خودکار با Rust…');
+  try {
+    const flat = flattenToCanvas().toDataURL('image/png');
+    let out;
+    try { out = await tauriInvoke('auto_retouch_image', { dataUrl: flat }); }
+    catch (e) {
+      out = await tauriInvoke('adjust_image', { dataUrl: flat, brightness: 5, contrast: 8, saturation: 12, warmth: 2, hue: 0, blur: 0, sharpen: 0 });
+    }
+    flattenIntoBase();
+    await loadFromDataURLKeepHistory(out);
+    setMsg('روتوش خودکار انجام شد ✨');
+  } catch (e) { setMsg('خطا در روتوش خودکار: ' + e.message); }
+}
 async function applyFilter(name) {
   if (!hasImage) { setMsg('اول یک عکس باز کنید'); return; }
   const flat = flattenToCanvas();
@@ -772,7 +815,7 @@ function snapshotTarget() {
   c.getContext('2d').drawImage(t.canvas, 0, 0);
   return c;
 }
-const BRUSH_TOOLS = ['skin', 'heal', 'object', 'clone', 'smudge', 'dodge', 'burn', 'blurBrush', 'sharpenBrush', 'colorize', 'liquify'];
+const BRUSH_TOOLS = ['skin', 'heal', 'object', 'clone', 'smudge', 'dodge', 'burn', 'blurBrush', 'sharpenBrush', 'colorize', 'liquify', 'whiten'];
 mainCanvas.addEventListener('pointerdown', (e) => {
   if (!hasImage) return;
   const pos = toImagePos(e);
@@ -848,7 +891,7 @@ mainCanvas.addEventListener('contextmenu', (e) => e.preventDefault());
 const TOOL_NAMES = { move: 'جابه‌جا', skin: 'صاف پوست', heal: 'پاک لک', object: 'حذف شیء',
   clone: 'کلون', liquify: 'تغییر فرم', smudge: 'محو کردن', dodge: 'روشن کن', burn: 'تیره کن',
   blurBrush: 'تاری', sharpenBrush: 'وضوح', colorize: 'رنگی کن', redeye: 'چشم قرمز',
-  crop: 'برش', text: 'متن' };
+  crop: 'برش', text: 'متن', whiten: 'سفید کن' };
 const TOOL_TIPS = {
   move: 'لایه فعال را بکشید تا جابه‌جا شود.',
   skin: 'روی پوست بکشید تا صاف و یکدست شود (Glamour Skin).',
@@ -863,6 +906,7 @@ const TOOL_TIPS = {
   sharpenBrush: 'روی ناحیه بکشید تا واضح‌تر شود.',
   colorize: 'با رنگ انتخاب‌شده روی ناحیه بکشید.',
   redeye: 'روی چشم قرمز کلیک کنید.',
+  whiten: 'روی دندان یا چشم بکشید تا سفیدتر و روشن‌تر شود (Whiten).',
   crop: 'مستطیل بکشید، بعد «اعمال برش» را بزنید.',
   text: 'روی عکس کلیک کنید، بعد «افزودن متن» را بزنید.',
 };
@@ -912,6 +956,7 @@ $('brushColor').oninput = (e) => { brushColor = e.target.value; };
   const el = $(id); if (el) el.addEventListener('input', updateAdjustLabels);
 });
 $('btnApplyAdjust').onclick = applyAdjust;
+$('btnAutoRetouch').onclick = applyAutoRetouch;
 $('btnResetAdjust').onclick = resetAdjustSliders;
 $('btnApplyLevels').onclick = applyLevels;
 $('btnApplyGlow').onclick = applyGlow;

@@ -107,7 +107,7 @@ struct AppInfo {
 #[tauri::command]
 fn get_app_info() -> AppInfo {
     AppInfo {
-        name: "ویرایشگر عکس".to_string(),
+        name: "Mori Instrument".to_string(),
         version: env!("CARGO_PKG_VERSION").to_string(),
         engine: "Rust + Tauri v2".to_string(),
     }
@@ -208,6 +208,69 @@ fn denoise_image(data_url: String, strength: f32) -> Result<String, String> {
     encode_png_data_url(&out)
 }
 
+/// روتوش خودکار (Auto Retouch — به سبک Facetune Enhance):
+/// سطوح خودکار + صاف کردن پوست + کمی کنتراست و اشباع — یک کلیک
+#[tauri::command]
+fn auto_retouch_image(data_url: String) -> Result<String, String> {
+    let (bytes, _mime) = decode_data_url(&data_url)?;
+    let mut img = image::load_from_memory(&bytes).map_err(|e| format!("بارگذاری عکس ناموفق بود: {e}"))?;
+    let mut rgba = img.to_rgba8();
+    let (w, h) = (rgba.width(), rgba.height());
+    // ۱) سطوح خودکار: برش ۱٪ تاریک‌ترین و روشن‌ترین پیکسل‌ها در هر کانال
+    let mut lo = [255u8; 3];
+    let mut hi = [0u8; 3];
+    for c in 0..3 {
+        let mut hist = [0u32; 256];
+        for px in rgba.pixels() {
+            hist[px.channels()[c] as usize] += 1;
+        }
+        let total = (w * h) as u32;
+        let cut = total / 100;
+        let mut acc = 0u32;
+        for v in 0..256 {
+            acc += hist[v];
+            if acc > cut {
+                lo[c] = v as u8;
+                break;
+            }
+        }
+        acc = 0;
+        for v in (0..256).rev() {
+            acc += hist[v];
+            if acc > cut {
+                hi[c] = v as u8;
+                break;
+            }
+        }
+    }
+    for px in rgba.pixels_mut() {
+        let ch = px.channels_mut();
+        for c in 0..3 {
+            let range = (hi[c] as i32 - lo[c] as i32).max(1);
+            ch[c] = (((ch[c] as i32 - lo[c] as i32) * 255) / range).clamp(0, 255) as u8;
+        }
+    }
+    // ۲) صاف کردن پوست: ترکیب با نسخه تار فقط روی پیکسل‌های پوست (YCbCr)
+    let blurred = image::imageops::blur(&DynamicImage::ImageRgba8(rgba.clone()), 2.0);
+    for (i, px) in rgba.pixels_mut().enumerate() {
+        let ch = px.channels_mut();
+        let (r, g, b) = (ch[0] as f32, ch[1] as f32, ch[2] as f32);
+        let cb = 128.0 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+        let cr = 128.0 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+        let is_skin = r > 95.0 && r > g && g > b && (77.0..=127.0).contains(&cb) && (133.0..=173.0).contains(&cr);
+        if is_skin {
+            let bc = blurred.get_pixel((i as u32) % w, (i as u32) / w).0;
+            for c in 0..3 {
+                ch[c] = clamp(ch[c] as f32 * 0.35 + bc[c] as f32 * 0.65);
+            }
+        }
+    }
+    img = DynamicImage::ImageRgba8(rgba);
+    // ۳) کمی کنتراست و اشباع
+    pixel_adjust(&mut img, 0.0, 8.0, 12.0, 2.0, 0.0);
+    encode_png_data_url(&img)
+}
+
 /// تغییر اندازه (Scale / Batch Resize) با Rust — خروجی PNG
 #[tauri::command]
 fn resize_image_data(data_url: String, width: u32, height: u32) -> Result<String, String> {
@@ -281,6 +344,7 @@ fn main() {
             save_image_data_url,
             adjust_image,
             denoise_image,
+            auto_retouch_image,
             resize_image_data,
             convert_to_gif,
             convert_image_format,
@@ -347,6 +411,15 @@ mod tests {
         assert!(bmp.starts_with("data:image/bmp;base64,"));
         let (bytes, _) = decode_data_url(&bmp).unwrap();
         assert_eq!(&bytes[0..2], b"BM", "BMP واقعی باید با BM شروع شود");
+    }
+
+    #[test]
+    fn auto_retouch_keeps_size_and_changes_pixels() {
+        let src = make_test_png();
+        let out = auto_retouch_image(src.clone()).unwrap();
+        assert_eq!(decode_out(&out).dimensions(), (8, 8));
+        assert_ne!(out, src, "روتوش خودکار باید پیکسل‌ها را عوض کند");
+        assert!(auto_retouch_image("not-a-data-url".to_string()).is_err());
     }
 
     #[test]

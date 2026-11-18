@@ -12,7 +12,7 @@
 <header class="titlebar">
   <span class="logo">📷</span>
   <strong>Mori Instrument</strong>
-  <small>PhotoInstrument style • Rust + Tauri • نسخه ۱٫۰٫۳</small>
+  <small>PhotoInstrument style • Rust + Tauri • نسخه ۱٫۰٫۴</small>
 </header>
 
 <!-- نوار منوی تیره: File / Edit / Plugins / Options / Help -->
@@ -41,6 +41,7 @@
     <button id="zoomFit" class="btn small">متناسب</button>
   </div>
   <button id="btnApplyAdjust" class="btn primary">✓ Apply — اعمال (Rust)</button>
+  <button id="btnAutoRetouch" class="btn" title="روتوش خودکار — مثل Facetune Enhance">✨ روتوش خودکار</button>
   <button id="btnAbout" class="btn" title="درباره برنامه">ℹ️ درباره</button>
   <div class="thumb-preview" title="پیش‌نمایش عکس">
     <span>پیش‌نمایش</span>
@@ -58,6 +59,7 @@
         <button class="tool active" data-tool="move" title="Brush — جابه‌جایی لایه">🖌️<b class="en">Brush</b><span>جابه‌جا</span></button>
         <button class="tool" data-tool="skin" title="Glamour Skin — صاف کردن پوست">✨<b class="en">Glamour Skin</b><span>صاف پوست</span></button>
         <button class="tool" data-tool="heal" title="Skin Cleaner — پاک کردن لک و جوش">🩹<b class="en">Skin Cleaner</b><span>پاک لک</span></button>
+        <button class="tool" data-tool="whiten" title="Whiten — سفید کردن دندان و روشن کردن چشم">🦷<b class="en">Whiten</b><span>سفید کن</span></button>
         <button class="tool" data-tool="object" title="Healing Brush — حذف شیء با ترمیم">🧽<b class="en">Healing Brush</b><span>حذف شیء</span></button>
         <button class="tool" data-tool="clone" title="Clone — Alt+کلیک منبع، بعد نقاشی">📋<b class="en">Clone</b><span>کلون</span></button>
         <button class="tool" data-tool="liquify" title="Liquify — کشیدن و تغییر فرم">🌊<b class="en">Liquify</b><span>تغییر فرم</span></button>
@@ -211,7 +213,7 @@
   <div class="modal-card">
     <div class="about-logo">📷</div>
     <h2>Mori Instrument</h2>
-    <p class="about-ver">نسخه ۱٫۰٫۳ • Rust + Tauri</p>
+    <p class="about-ver">نسخه ۱٫۰٫۴ • Rust + Tauri</p>
     <p>ساخته شده توسط Mori J</p>
     <p>ایده از برنامه PhotoInstrument</p>
     <p class="about-link">photoinstrument.com</p>
