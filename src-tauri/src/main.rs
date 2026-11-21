@@ -7,7 +7,7 @@ use base64::{engine::general_purpose::STANDARD as B64, Engine as _};
 use image::{DynamicImage, GenericImageView, ImageFormat, Pixel};
 use serde::Serialize;
 use std::io::Cursor;
-use tauri::{AppHandle, Manager, WindowEvent};
+use tauri::{AppHandle, Emitter, Manager, WindowEvent};
 use tauri_plugin_dialog::DialogExt;
 
 // ---------- ابزارهای کمکی ----------
@@ -116,29 +116,35 @@ fn get_app_info() -> AppInfo {
 /// پنجره انتخاب عکس (Rust + پلاگین dialog)
 #[tauri::command]
 async fn open_image_dialog(app: AppHandle) -> Result<Option<String>, String> {
-    let file = app
-        .dialog()
+    // در tauri-plugin-dialog 2 متدهای pick_file/save_file/pick_folder فقط
+    // نسخه callback دارند و Future نیستند؛ نتیجه را با oneshot برمی‌گردانیم
+    let (tx, rx) = tokio::sync::oneshot::channel();
+    app.dialog()
         .file()
         .add_filter("تصاویر", &["png", "jpg", "jpeg", "bmp", "gif", "webp"])
         .add_filter("همه فایل‌ها", &["*"])
-        .pick_file()
-        .await;
+        .pick_file(move |path| {
+            let _ = tx.send(path);
+        });
+    let file = rx.await.ok().flatten();
     Ok(file.and_then(|p| p.as_path().map(|x| x.to_string_lossy().to_string())))
 }
 
 /// پنجره ذخیره عکس
 #[tauri::command]
 async fn save_image_dialog(app: AppHandle, default_name: String) -> Result<Option<String>, String> {
-    let file = app
-        .dialog()
+    let (tx, rx) = tokio::sync::oneshot::channel();
+    app.dialog()
         .file()
         .set_file_name(&default_name)
         .add_filter("PNG", &["png"])
         .add_filter("JPEG", &["jpg", "jpeg"])
         .add_filter("BMP", &["bmp"])
         .add_filter("GIF", &["gif"])
-        .save_file()
-        .await;
+        .save_file(move |path| {
+            let _ = tx.send(path);
+        });
+    let file = rx.await.ok().flatten();
     Ok(file.and_then(|p| p.as_path().map(|x| x.to_string_lossy().to_string())))
 }
 
@@ -322,7 +328,11 @@ fn convert_to_gif(data_url: String) -> Result<String, String> {
 /// انتخاب پوشه مقصد برای تغییر اندازه گروهی
 #[tauri::command]
 async fn pick_folder_dialog(app: AppHandle) -> Result<Option<String>, String> {
-    let folder = app.dialog().file().pick_folder().await;
+    let (tx, rx) = tokio::sync::oneshot::channel();
+    app.dialog().file().pick_folder(move |path| {
+        let _ = tx.send(path);
+    });
+    let folder = rx.await.ok().flatten();
     Ok(folder.and_then(|p| p.as_path().map(|x| x.to_string_lossy().to_string())))
 }
 
