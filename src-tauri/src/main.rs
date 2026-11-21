@@ -7,7 +7,7 @@ use base64::{engine::general_purpose::STANDARD as B64, Engine as _};
 use image::{DynamicImage, GenericImageView, ImageFormat, Pixel};
 use serde::Serialize;
 use std::io::Cursor;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager, WindowEvent};
 use tauri_plugin_dialog::DialogExt;
 
 // ---------- ابزارهای کمکی ----------
@@ -115,19 +115,20 @@ fn get_app_info() -> AppInfo {
 
 /// پنجره انتخاب عکس (Rust + پلاگین dialog)
 #[tauri::command]
-fn open_image_dialog(app: AppHandle) -> Result<Option<String>, String> {
+async fn open_image_dialog(app: AppHandle) -> Result<Option<String>, String> {
     let file = app
         .dialog()
         .file()
         .add_filter("تصاویر", &["png", "jpg", "jpeg", "bmp", "gif", "webp"])
         .add_filter("همه فایل‌ها", &["*"])
-        .blocking_pick_file();
+        .pick_file()
+        .await;
     Ok(file.and_then(|p| p.as_path().map(|x| x.to_string_lossy().to_string())))
 }
 
 /// پنجره ذخیره عکس
 #[tauri::command]
-fn save_image_dialog(app: AppHandle, default_name: String) -> Result<Option<String>, String> {
+async fn save_image_dialog(app: AppHandle, default_name: String) -> Result<Option<String>, String> {
     let file = app
         .dialog()
         .file()
@@ -136,7 +137,8 @@ fn save_image_dialog(app: AppHandle, default_name: String) -> Result<Option<Stri
         .add_filter("JPEG", &["jpg", "jpeg"])
         .add_filter("BMP", &["bmp"])
         .add_filter("GIF", &["gif"])
-        .blocking_save_file();
+        .save_file()
+        .await;
     Ok(file.and_then(|p| p.as_path().map(|x| x.to_string_lossy().to_string())))
 }
 
@@ -319,8 +321,8 @@ fn convert_to_gif(data_url: String) -> Result<String, String> {
 
 /// انتخاب پوشه مقصد برای تغییر اندازه گروهی
 #[tauri::command]
-fn pick_folder_dialog(app: AppHandle) -> Result<Option<String>, String> {
-    let folder = app.dialog().file().blocking_pick_folder();
+async fn pick_folder_dialog(app: AppHandle) -> Result<Option<String>, String> {
+    let folder = app.dialog().file().pick_folder().await;
     Ok(folder.and_then(|p| p.as_path().map(|x| x.to_string_lossy().to_string())))
 }
 
@@ -330,6 +332,15 @@ fn image_dimensions(data_url: String) -> Result<(u32, u32), String> {
     let (bytes, _mime) = decode_data_url(&data_url)?;
     let img = image::load_from_memory(&bytes).map_err(|e| format!("بارگذاری عکس ناموفق بود: {e}"))?;
     Ok(img.dimensions())
+}
+
+/// بستن پنجره اصلی — فقط از فرانت‌اند صدا زده می‌شود، بعد از اینکه
+/// پرسش ذخیره هنگام خروج جواب داده شد
+#[tauri::command]
+fn close_window(app: AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.close();
+    }
 }
 
 fn main() {
@@ -349,8 +360,17 @@ fn main() {
             convert_to_gif,
             convert_image_format,
             pick_folder_dialog,
-            image_dimensions
+            image_dimensions,
+            close_window
         ])
+        // هنگام بستن پنجره، اول به فرانت‌اند خبر بده تا اگر تغییر
+        // ذخیره‌نشده هست، از کاربر بپرسد؛ فرانت‌اند خودش پنجره را می‌بندد
+        .on_window_event(|window, event| {
+            if let WindowEvent::CloseRequested { api, .. } = event {
+                api.prevent_close();
+                let _ = window.emit("close-requested", ());
+            }
+        })
         .run(tauri::generate_context!())
         .expect("خطا در اجرای برنامه ویرایشگر عکس");
 }

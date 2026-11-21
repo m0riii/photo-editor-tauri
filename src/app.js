@@ -18,6 +18,8 @@ let currentTool = 'move';
 let brushSize = 60, brushStrength = 50, brushColor = '#ff5a5a';
 let zoom = 1, hasImage = false;
 let history = [], hIndex = -1;
+let savedHIndex = 0; // اندیس تاریخچه در آخرین ذخیره — برای پرسش ذخیره هنگام خروج
+let originalDataUrl = null, originalImg = null, showingOriginal = false; // عکس اصلی برای دکمه Original
 let isDrawing = false, lastPos = null, strokeSnapshot = null, cloneOffset = null;
 let mousePos = null; // موقعیت نشانگر روی عکس (مختصات تصویر) برای پیش‌نمایش دایره قلم
 let cropRect = null, cropStart = null, textPos = null, dragLayer = null;
@@ -38,12 +40,17 @@ function setToolLabel(name) { $('statusTool').textContent = t('toolPrefix') + na
 /* ---------- زبان برنامه (فارسی / English) ---------- */
 const I18N = {
   fa: {
-    menuFile: 'فایل', menuEdit: 'ویرایش', menuPlugins: 'پلاگین‌ها', menuOptions: 'گزینه‌ها', menuHelp: 'راهنما',
-    open: '📂 باز کردن عکس', save: '💾 ذخیره', saveAs: '💾 ذخیره با نام…',
-    original: 'Original — اصلی', originalTitle: 'بازگشت به عکس اصلی',
-    undo: '↩ واگرد', redo: '↪ از نو', fit: 'متناسب',
-    applyAdjust: '✓ Apply — اعمال (Rust)', autoRetouch: '✨ روتوش خودکار', autoRetouchTitle: 'روتوش خودکار — مثل Facetune Enhance',
-    aboutBtn: 'ℹ️ درباره', langBtn: 'زبان', preview: 'پیش‌نمایش',
+    menuFile: 'فایل', menuEdit: 'ویرایش', menuView: 'نمایش', menuTools: 'ابزار', menuHelp: 'راهنما',
+    open: 'باز کردن عکس', save: 'ذخیره', saveAs: 'ذخیره با نام…',
+    original: 'بازگشت به اصلی', originalTitle: 'بازگرداندن عکس به حالت اول',
+    compareOriginal: 'Original', compareOriginalTitle: 'نگه دارید تا عکس اصلی را ببینید',
+    applyBtn: 'اعمال',
+    saveAskTitle: 'تغییرات ذخیره نشده', saveAskText: 'عکس تغییر کرده است. قبل از خروج ذخیره شود؟',
+    saveYes: 'ذخیره', saveNo: 'ذخیره نکن', saveCancel: 'لغو',
+    msgShowingOriginal: 'در حال نمایش عکس اصلی — رها کنید تا به ویرایش برگردید',
+    undo: 'واگرد', redo: 'از نو', fit: 'متناسب', zoomIn: 'بزرگ‌نمایی', zoomOut: 'کوچک‌نمایی',
+    applyAdjust: 'اعمال تنظیمات', autoRetouch: 'روتوش خودکار', autoRetouchTitle: 'روتوش خودکار — مثل Facetune Enhance',
+    aboutBtn: 'درباره', langBtn: 'زبان', toolsToggle: 'ابزارها',
     instruments: 'Instruments — ابزارها', mode: 'Mode — حالت ابزار',
     brushMode: 'Brush — قلم', eraserMode: 'Eraser — پاک‌کن',
     sizeLabel: 'Size — اندازه قلم', pixels: 'پیکسل', hardnessLabel: 'Hardness — سختی / قدرت', colorLabel: 'رنگ (برای رنگی کردن)',
@@ -65,12 +72,12 @@ const I18N = {
     flatten: '⤵ ادغام همه لایه‌ها', layerOpacity: 'شفافیت لایه فعال',
     width: 'عرض', height: 'ارتفاع',
     batchTip: 'چند عکس انتخاب کنید؛ همه به یک اندازه تبدیل و دانلود می‌شوند.', batchBtn: '📦 انتخاب چند عکس و تبدیل',
-    dropTitle: 'عکس را اینجا رها کنید', dropText: 'یا دکمه «باز کردن عکس» را بزنید — JPG ،PNG ،BMP ،GIF',
+    dropTitle: 'عکس را اینجا رها کنید', dropText: 'یا از منوی «فایل»، «باز کردن عکس» را بزنید — JPG ،PNG ،BMP ،GIF',
     dropNote: 'عکس شما از دستگاهتان بیرون نمی‌رود؛ همه‌چیز روی همین کامپیوتر پردازش می‌شود.',
     engine: 'موتور: Rust + Tauri',
     aboutBy: 'ساخته شده توسط Mori J', aboutIdea: 'ایده از برنامه PhotoInstrument', close: 'بستن',
     langTitle: 'زبان برنامه را انتخاب کنید', langSub: 'Choose the app language',
-    versionLine: 'PhotoInstrument style • Rust + Tauri • نسخه ۱٫۰٫۵', aboutVer: 'نسخه ۱٫۰٫۵ • Rust + Tauri',
+    aboutVer: 'نسخه ۱٫۰٫۶ • Rust + Tauri',
     toolPrefix: 'ابزار: ',
     msgOpenFirst: 'اول یک عکس باز کنید', msgUndo: 'واگرد انجام شد', msgRedo: 'از نو انجام شد',
     msgOpened: 'عکس باز شد: ', msgSaved: 'ذخیره شد: ',
@@ -93,12 +100,17 @@ const I18N = {
     msgLayerAdded: 'لایه عکس اضافه شد', msgDropImage: 'فایل عکس را رها کنید',
   },
   en: {
-    menuFile: 'File', menuEdit: 'Edit', menuPlugins: 'Plugins', menuOptions: 'Options', menuHelp: 'Help',
-    open: '📂 Open Image', save: '💾 Save', saveAs: '💾 Save As…',
-    original: 'Original', originalTitle: 'Back to the original image',
-    undo: '↩ Undo', redo: '↪ Redo', fit: 'Fit',
-    applyAdjust: '✓ Apply (Rust)', autoRetouch: '✨ Auto Retouch', autoRetouchTitle: 'Auto Retouch — like Facetune Enhance',
-    aboutBtn: 'ℹ️ About', langBtn: 'Language', preview: 'Preview',
+    menuFile: 'File', menuEdit: 'Edit', menuView: 'View', menuTools: 'Tools', menuHelp: 'Help',
+    open: 'Open Image', save: 'Save', saveAs: 'Save As…',
+    original: 'Reset to Original', originalTitle: 'Restore the original image',
+    compareOriginal: 'Original', compareOriginalTitle: 'Hold to see the original photo',
+    applyBtn: 'Apply',
+    saveAskTitle: 'Unsaved changes', saveAskText: 'The photo has unsaved changes. Save before closing?',
+    saveYes: 'Save', saveNo: "Don't Save", saveCancel: 'Cancel',
+    msgShowingOriginal: 'Showing the original photo — release to go back to your edit',
+    undo: 'Undo', redo: 'Redo', fit: 'Fit', zoomIn: 'Zoom In', zoomOut: 'Zoom Out',
+    applyAdjust: 'Apply Adjustments', autoRetouch: 'Auto Retouch', autoRetouchTitle: 'Auto Retouch — like Facetune Enhance',
+    aboutBtn: 'About', langBtn: 'Language', toolsToggle: 'Tools',
     instruments: 'Instruments', mode: 'Mode',
     brushMode: 'Brush', eraserMode: 'Eraser',
     sizeLabel: 'Size — Brush size', pixels: 'px', hardnessLabel: 'Hardness — Strength', colorLabel: 'Color (for Colorize)',
@@ -120,12 +132,12 @@ const I18N = {
     flatten: '⤵ Flatten All Layers', layerOpacity: 'Active layer opacity',
     width: 'Width', height: 'Height',
     batchTip: 'Pick several photos; all will be resized to one size and downloaded.', batchBtn: '📦 Pick Photos & Convert',
-    dropTitle: 'Drop your photo here', dropText: 'Or click “Open Image” — JPG, PNG, BMP, GIF',
+    dropTitle: 'Drop your photo here', dropText: 'Or use File → Open Image — JPG, PNG, BMP, GIF',
     dropNote: 'Your photo never leaves your device; everything is processed on this computer.',
     engine: 'Engine: Rust + Tauri',
     aboutBy: 'Made by Mori J', aboutIdea: 'Idea from PhotoInstrument', close: 'Close',
     langTitle: 'Choose the app language', langSub: 'زبان برنامه را انتخاب کنید',
-    versionLine: 'PhotoInstrument style • Rust + Tauri • Version 1.0.5', aboutVer: 'Version 1.0.5 • Rust + Tauri',
+    aboutVer: 'Version 1.0.6 • Rust + Tauri',
     toolPrefix: 'Tool: ',
     msgOpenFirst: 'Open a photo first', msgUndo: 'Undone', msgRedo: 'Redone',
     msgOpened: 'Photo opened: ', msgSaved: 'Saved: ',
@@ -202,10 +214,14 @@ function pushHistory() {
   if (history.length > 25) history.shift();
   hIndex = history.length - 1;
   updateUndoButtons();
+  updateThumbs();
 }
 function updateUndoButtons() {
   $('btnUndo').disabled = hIndex <= 0;
   $('btnRedo').disabled = hIndex >= history.length - 1;
+  const tu = $('tbUndo'), tr = $('tbRedo');
+  if (tu) tu.disabled = hIndex <= 0;
+  if (tr) tr.disabled = hIndex >= history.length - 1;
 }
 async function restoreSnapshot(snap) {
   const img = await loadImage(snap.base);
@@ -267,8 +283,9 @@ function render() {
     mctx.restore();
   }
   $('zoomLabel').textContent = pct(Math.round(zoom * 100));
-  $('statusSize').textContent = work.width + ' × ' + work.height + ' پیکسل' +
-    (layers.length ? ' • ' + layers.length + ' لایه' : '');
+  const tbz = $('tbZoom'); if (tbz) tbz.textContent = Math.round(zoom * 100) + '%';
+  $('statusSize').textContent = work.width + ' × ' + work.height + ' ' + (currentLang === 'fa' ? 'پیکسل' : 'px') +
+    (layers.length ? ' • ' + layers.length + ' ' + (currentLang === 'fa' ? 'لایه' : 'layers') : '');
 }
 function setZoom(z, fit) {
   if (!hasImage) return;
@@ -307,6 +324,8 @@ async function loadFromDataURL(dataUrl, name) {
   $('resizeW').value = img.width; $('resizeH').value = img.height;
   history = []; hIndex = -1;
   pushHistory();
+  savedHIndex = hIndex;
+  originalDataUrl = dataUrl; originalImg = img;
   setZoom(0, true);
   renderLayersList();
   setMsg(t('msgOpened') + currentFileName);
@@ -340,7 +359,7 @@ function downloadDataURL(dataUrl, filename) {
 }
 function baseName(name) { return name.replace(/\.[^.]+$/, '') || 'edited'; }
 async function saveAs() {
-  if (!hasImage) { setMsg(t('msgOpenFirst')); return; }
+  if (!hasImage) { setMsg(t('msgOpenFirst')); return false; }
   const format = (currentFileName.split('.').pop() || 'png').toLowerCase();
   let dataUrl = compositeDataURL(format);
   const outName = baseName(currentFileName) + '.' + (format === 'jpeg' ? 'jpg' : format);
@@ -350,9 +369,11 @@ async function saveAs() {
       dataUrl = await tauriInvoke('convert_image_format', { dataUrl, format });
     }
     const path = await tauriInvoke('save_image_dialog', { defaultName: outName });
-    if (!path) return;
+    if (!path) return false;
     await tauriInvoke('save_image_data_url', { path, dataUrl });
     setMsg(t('msgSaved') + path);
+    savedHIndex = hIndex;
+    return true;
   } catch (e) {
     if (format === 'bmp' || format === 'gif') {
       // در پیش‌نمایش مرورگر encoder برای BMP/GIF نیست؛ PNG ذخیره می‌شود
@@ -362,11 +383,53 @@ async function saveAs() {
       downloadDataURL(dataUrl, outName);
       setMsg(t('msgDownloaded') + outName);
     }
+    savedHIndex = hIndex;
+    return true;
   }
 }
 async function saveQuick() {
-  if (!hasImage) { setMsg(t('msgOpenFirst')); return; }
-  await saveAs();
+  if (!hasImage) { setMsg(t('msgOpenFirst')); return false; }
+  return await saveAs();
+}
+
+/* ---------- تصویر کوچک پیش‌نمایش + دکمه Original ---------- */
+function updateThumbs() {
+  if (!hasImage) return;
+  try {
+    const url = flattenToCanvas().toDataURL('image/jpeg', 0.55);
+    const top = $('topThumb'), left = $('leftThumb');
+    if (top) { top.src = url; $('topPreview').hidden = false; }
+    if (left) { left.src = url; $('leftThumbBox').hidden = false; }
+  } catch (e) { /* پیش‌نمایش کوچک اختیاری است */ }
+}
+// دکمه Original در نوار بالا: تا وقتی نگه داشته می‌شود عکس اصلی را نشان می‌دهد،
+ // مثل PhotoInstrument — با رها کردن، ویرایش برمی‌گردد
+function showOriginal() {
+  if (!hasImage || !originalImg || showingOriginal) return;
+  showingOriginal = true;
+  const dw = mainCanvas.width, dh = mainCanvas.height;
+  mctx.clearRect(0, 0, dw, dh);
+  mctx.imageSmoothingQuality = 'high';
+  mctx.drawImage(originalImg, 0, 0, dw, dh);
+  $('btnOriginal').classList.add('active');
+  setMsg(t('msgShowingOriginal'));
+}
+function hideOriginal() {
+  if (!showingOriginal) return;
+  showingOriginal = false;
+  $('btnOriginal').classList.remove('active');
+  setMsg('');
+  render();
+}
+
+/* ---------- پرسش ذخیره هنگام خروج ---------- */
+function isDirty() { return hasImage && hIndex !== savedHIndex; }
+function closeAppWindow() {
+  tauriInvoke('close_window', {}).catch(() => { /* در مرورگر پنجره‌ای برای بستن نیست */ });
+}
+function requestClose() {
+  if (!isDirty()) { closeAppWindow(); return; }
+  $('saveModal').hidden = false;
 }
 
 /* ---------- لایه‌ها ---------- */
@@ -472,10 +535,10 @@ function paintBrushStroke(pos, prev) {
   for (const p of pts) {
     if (currentTool === 'skin' || currentTool === 'blurBrush') {
       ensureDerived();
-      paintFrom(blurredCache, p, currentTool === 'skin' ? a * 0.85 : a);
+      paintFrom(blurredCache, p, p, currentTool === 'skin' ? a * 0.85 : a);
     } else if (currentTool === 'sharpenBrush') {
       ensureDerived();
-      paintFrom(sharpenedCache, p, a);
+      paintFrom(sharpenedCache, p, p, a);
     } else if (currentTool === 'heal' || currentTool === 'object') {
       healAt(p, currentTool === 'object' ? 1.6 : 1);
     } else if (currentTool === 'clone') {
@@ -1105,17 +1168,48 @@ function setTool(tool) {
 }
 document.querySelectorAll('.tool').forEach(b => b.addEventListener('click', () => setTool(b.dataset.tool)));
 
+/* ---------- منوهای کشویی ---------- */
+document.querySelectorAll('.menu > .menu-item').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const drop = btn.parentElement.querySelector('.menu-drop');
+    const wasOpen = drop.classList.contains('open');
+    document.querySelectorAll('.menu-drop.open').forEach(d => d.classList.remove('open'));
+    if (!wasOpen) drop.classList.add('open');
+  });
+});
+document.addEventListener('click', () => document.querySelectorAll('.menu-drop.open').forEach(d => d.classList.remove('open')));
+
+/* ---------- نوار ابزار بالایی + دکمه Original ---------- */
+$('tbUndo').onclick = undo;
+$('tbRedo').onclick = redo;
+$('tbZoomIn').onclick = () => setZoom(zoom * 1.25);
+$('tbZoomOut').onclick = () => setZoom(zoom / 1.25);
+$('tbApply').onclick = applyAdjust;
+const btnOriginal = $('btnOriginal');
+btnOriginal.addEventListener('pointerdown', (e) => { e.preventDefault(); showOriginal(); });
+['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => btnOriginal.addEventListener(ev, hideOriginal));
+btnOriginal.addEventListener('contextmenu', (e) => e.preventDefault());
+
+/* ---------- بستن برنامه: اگر تغییر ذخیره‌نشده هست، اول بپرس ---------- */
+$('btnSaveYes').onclick = async () => { $('saveModal').hidden = true; const ok = await saveQuick(); if (ok) closeAppWindow(); };
+$('btnSaveNo').onclick = () => { $('saveModal').hidden = true; closeAppWindow(); };
+$('btnSaveCancel').onclick = () => { $('saveModal').hidden = true; };
+try {
+  const tev = window.__TAURI__ && window.__TAURI__.event;
+  if (tev && typeof tev.listen === 'function') tev.listen('close-requested', requestClose);
+} catch (e) { /* در مرورگر معمولی رویداد بستن وجود ندارد */ }
+
 /* ---------- پنجره درباره برنامه ---------- */
 function openAbout() { $('aboutModal').hidden = false; }
 function closeAbout() { $('aboutModal').hidden = true; }
 $('btnAbout').onclick = openAbout;
-$('menuHelp').onclick = openAbout;
 $('aboutClose').onclick = closeAbout;
 $('btnLang').onclick = showLangPicker;
 $('langFa').onclick = () => applyLanguage('fa');
 $('langEn').onclick = () => applyLanguage('en');
 $('aboutModal').addEventListener('click', (e) => { if (e.target === $('aboutModal')) closeAbout(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAbout(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeAbout(); $('saveModal').hidden = true; } });
 
 /* ---------- اتصال دکمه‌ها ---------- */
 $('btnOpen').onclick = openImage;

@@ -8,89 +8,112 @@
 </head>
 <body>
 
-<!-- نوار عنوان روشن، مثل PhotoInstrument 7.7 -->
-<header class="titlebar">
-  <span class="logo">📷</span>
-  <strong>Mori Instrument</strong>
-  <small data-i18n="versionLine">PhotoInstrument style • Rust + Tauri • نسخه ۱٫۰٫۵</small>
-</header>
-
-<!-- نوار منوی تیره: File / Edit / Plugins / Options / Help -->
+<!-- نوار منو — مثل PhotoInstrument 7.7 -->
 <nav class="menubar" aria-label="منو">
-  <button type="button" class="menu-item" data-i18n="menuFile">فایل <span class="menu-en">File</span></button>
-  <button type="button" class="menu-item" data-i18n="menuEdit">ویرایش <span class="menu-en">Edit</span></button>
-  <button type="button" class="menu-item" data-i18n="menuPlugins">پلاگین‌ها <span class="menu-en">Plugins</span></button>
-  <button type="button" class="menu-item" data-i18n="menuOptions">گزینه‌ها <span class="menu-en">Options</span></button>
-  <button type="button" class="menu-item" id="menuHelp" data-i18n="menuHelp">راهنما <span class="menu-en">Help</span></button>
+  <div class="menu">
+    <button type="button" class="menu-item" data-i18n="menuFile">فایل <span class="menu-en">File</span></button>
+    <div class="menu-drop">
+      <button type="button" id="btnOpen" class="menu-entry" data-i18n="open">باز کردن عکس</button>
+      <button type="button" id="btnSave" class="menu-entry" data-i18n="save">ذخیره</button>
+      <button type="button" id="btnSaveAs" class="menu-entry" data-i18n="saveAs">ذخیره با نام…</button>
+    </div>
+  </div>
+  <div class="menu">
+    <button type="button" class="menu-item" data-i18n="menuEdit">ویرایش <span class="menu-en">Edit</span></button>
+    <div class="menu-drop">
+      <button type="button" id="btnUndo" class="menu-entry" title="Ctrl+Z" data-i18n="undo">واگرد</button>
+      <button type="button" id="btnRedo" class="menu-entry" title="Ctrl+Y" data-i18n="redo">از نو</button>
+      <button type="button" id="btnReset" class="menu-entry" data-i18n="original" data-i18n-title="originalTitle">بازگشت به اصلی</button>
+    </div>
+  </div>
+  <div class="menu">
+    <button type="button" class="menu-item" data-i18n="menuView">نمایش <span class="menu-en">View</span></button>
+    <div class="menu-drop">
+      <button type="button" id="zoomIn" class="menu-entry" data-i18n="zoomIn">بزرگ‌نمایی</button>
+      <button type="button" id="zoomOut" class="menu-entry" data-i18n="zoomOut">کوچک‌نمایی</button>
+      <button type="button" id="zoomFit" class="menu-entry" data-i18n="fit">متناسب</button>
+    </div>
+  </div>
+  <div class="menu">
+    <button type="button" class="menu-item" data-i18n="menuTools">ابزار <span class="menu-en">Tools</span></button>
+    <div class="menu-drop">
+      <button type="button" id="btnAutoRetouch" class="menu-entry" data-i18n="autoRetouch" data-i18n-title="autoRetouchTitle">روتوش خودکار</button>
+      <button type="button" id="btnApplyAdjust" class="menu-entry" data-i18n="applyAdjust">اعمال تنظیمات</button>
+    </div>
+  </div>
+  <div class="menu">
+    <button type="button" class="menu-item" id="menuHelp" data-i18n="menuHelp">راهنما <span class="menu-en">Help</span></button>
+    <div class="menu-drop">
+      <button type="button" id="btnAbout" class="menu-entry" data-i18n="aboutBtn">درباره</button>
+      <button type="button" id="btnLang" class="menu-entry" data-i18n="langBtn">زبان</button>
+    </div>
+  </div>
 </nav>
 
-<!-- ردیف ابزار دوم: فایل، Original، واگرد/ازنو، زوم، Apply، پیش‌نمایش -->
+<!-- نوار ابزار بالایی — مثل PhotoInstrument 7.7 -->
 <div class="toolbar">
-  <div class="file-actions">
-    <button id="btnOpen" class="btn primary" data-i18n="open">📂 باز کردن عکس</button>
-    <button id="btnSave" class="btn" data-i18n="save">💾 ذخیره</button>
-    <button id="btnSaveAs" class="btn" data-i18n="saveAs">💾 ذخیره با نام…</button>
-  </div>
-  <button id="btnReset" class="btn primary" data-i18n="original" data-i18n-title="originalTitle">Original — اصلی</button>
-  <button id="btnUndo" class="btn" title="Ctrl+Z" data-i18n="undo">↩ واگرد</button>
-  <button id="btnRedo" class="btn" title="Ctrl+Y" data-i18n="redo">↪ از نو</button>
-  <div class="zoom-box">
-    <button id="zoomOut" class="btn small">−</button>
-    <span id="zoomLabel">۱۰۰٪</span>
-    <button id="zoomIn" class="btn small">+</button>
-    <button id="zoomFit" class="btn small" data-i18n="fit">متناسب</button>
-  </div>
-  <button id="btnApplyAdjust" class="btn primary" data-i18n="applyAdjust">✓ Apply — اعمال (Rust)</button>
-  <button id="btnAutoRetouch" class="btn" data-i18n="autoRetouch" data-i18n-title="autoRetouchTitle">✨ روتوش خودکار</button>
-  <button id="btnAbout" class="btn" title="درباره برنامه" data-i18n="aboutBtn">ℹ️ درباره</button>
-  <button id="btnLang" class="btn" title="زبان / Language">🌐 <span data-i18n="langBtn">زبان</span></button>
-  <div class="thumb-preview" title="پیش‌نمایش عکس">
-    <span data-i18n="preview">پیش‌نمایش</span>
-  </div>
+  <button type="button" id="btnOriginal" class="tbtn" data-i18n="compareOriginal" data-i18n-title="compareOriginalTitle">Original</button>
+  <button type="button" id="tbUndo" class="sqbtn" title="Undo — Ctrl+Z"><svg viewBox="0 0 24 24" fill="none" stroke="#2e9e4f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10a8 8 0 1 1 2 6"/><path d="M4 16v-6h6"/></svg></button>
+  <button type="button" id="tbRedo" class="sqbtn" title="Redo — Ctrl+Y"><svg viewBox="0 0 24 24" fill="none" stroke="#777" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10a8 8 0 1 0-2 6"/><path d="M20 16v-6h-6"/></svg></button>
+  <button type="button" id="tbZoomOut" class="sqbtn" title="Zoom Out"><svg viewBox="0 0 24 24" fill="none" stroke="#2f6fd0" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5M7.5 10.5h6"/></svg></button>
+  <button type="button" id="tbZoomIn" class="sqbtn" title="Zoom In"><svg viewBox="0 0 24 24" fill="none" stroke="#2f6fd0" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5M10.5 7.5v6M7.5 10.5h6"/></svg></button>
+  <span class="zoombox" id="tbZoom">100%</span>
+  <button type="button" id="tbApply" class="tbtn" data-i18n="applyBtn">اعمال</button>
+  <span class="preview" id="topPreview" hidden><img id="topThumb" alt=""><i></i></span>
 </div>
 
 <main class="layout">
-  <!-- ستون کناری سمت چپ، مثل PhotoInstrument: ابزارها + پنل حالت + تنظیمات -->
-  <aside class="sidebar">
-
+  <!-- ستون کناری — همیشه دیده می‌شود، مثل PhotoInstrument 7.7 -->
+  <aside class="sidebar" id="sidebar">
     <!-- شبکه ابزارها -->
     <section class="instruments">
-      <div class="section-header" data-i18n="instruments">Instruments — ابزارها</div>
+      <div class="phead" data-i18n="instruments">Instruments — ابزارها</div>
       <div class="tools-grid" id="toolsBar" aria-label="ابزارها">
-        <button class="tool active" data-tool="move" title="Brush — جابه‌جایی لایه">🖌️<b class="en">Brush</b><span>جابه‌جا</span></button>
-        <button class="tool" data-tool="skin" title="Glamour Skin — صاف کردن پوست">✨<b class="en">Glamour Skin</b><span>صاف پوست</span></button>
-        <button class="tool" data-tool="heal" title="Skin Cleaner — پاک کردن لک و جوش">🩹<b class="en">Skin Cleaner</b><span>پاک لک</span></button>
-        <button class="tool" data-tool="whiten" title="Whiten — سفید کردن دندان و روشن کردن چشم">🦷<b class="en">Whiten</b><span>سفید کن</span></button>
-        <button class="tool" data-tool="object" title="Healing Brush — حذف شیء با ترمیم">🧽<b class="en">Healing Brush</b><span>حذف شیء</span></button>
-        <button class="tool" data-tool="clone" title="Clone — Alt+کلیک منبع، بعد نقاشی">📋<b class="en">Clone</b><span>کلون</span></button>
-        <button class="tool" data-tool="liquify" title="Liquify — کشیدن و تغییر فرم">🌊<b class="en">Liquify</b><span>تغییر فرم</span></button>
-        <button class="tool" data-tool="smudge" title="Smudge — مالیدن و محو">👆<b class="en">Smudge</b><span>محو کردن</span></button>
-        <button class="tool" data-tool="dodge" title="Dodge — روشن کردن">🔆<b class="en">Dodge</b><span>روشن کن</span></button>
-        <button class="tool" data-tool="burn" title="Burn — تیره کردن">🌑<b class="en">Burn</b><span>تیره کن</span></button>
-        <button class="tool" data-tool="blurBrush" title="Blur — تاری قلمی">💧<b class="en">Blur</b><span>تاری</span></button>
-        <button class="tool" data-tool="sharpenBrush" title="Sharpen — وضوح قلمی">🔍<b class="en">Sharpen</b><span>وضوح</span></button>
-        <button class="tool" data-tool="colorize" title="Colorize — رنگ‌آمیزی">🎨<b class="en">Colorize</b><span>رنگی کن</span></button>
-        <button class="tool" data-tool="redeye" title="Red Eye Removal — کلیک روی چشم قرمز">👁️<b class="en">Red Eye Removal</b><span>چشم قرمز</span></button>
-        <button class="tool" data-tool="crop" title="Crop — کشیدن مستطیل و اعمال">✂️<b class="en">Crop</b><span>برش</span></button>
-        <button class="tool" data-tool="text" title="Text — کلیک و تایپ متن">🔤<b class="en">Text</b><span>متن</span></button>
+        <button class="tool active" data-tool="move" title="Brush — جابه‌جایی لایه"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L12 14l-4 1 1-4 7.5-7.5Z"/><path d="M13.5 6.5l4 4"/><path d="M5 19c-1 1-2 2.5-2 2.5S4.5 20 5 19Z"/></svg><b class="en">Brush</b><span>جابه‌جا</span></button>
+        <button class="tool" data-tool="skin" title="Glamour Skin — صاف کردن پوست"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4l1.7 4.8L17.5 10.5l-4.8 1.7L11 17l-1.7-4.8L4.5 10.5l4.8-1.7L11 4Z"/><path d="M18.5 14.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9.9-2.1Z"/></svg><b class="en">Glamour Skin</b><span>صاف پوست</span></button>
+        <button class="tool" data-tool="heal" title="Skin Cleaner — پاک کردن لک و جوش"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="8" rx="4" transform="rotate(-45 12 12)"/><circle cx="10" cy="14" r="0.9" fill="currentColor" stroke="none"/><circle cx="14" cy="10" r="0.9" fill="currentColor" stroke="none"/></svg><b class="en">Skin Cleaner</b><span>پاک لک</span></button>
+        <button class="tool" data-tool="whiten" title="Whiten — سفید کردن دندان و روشن کردن چشم"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c2.5-3.5 5.5-5 9-5s6.5 1.5 9 5c-2.5 3.5-5.5 5-9 5s-6.5-1.5-9-5Z"/><path d="M3.5 12c2.8 1.4 5.6 2 8.5 2s5.7-.6 8.5-2"/></svg><b class="en">Whiten</b><span>سفید کن</span></button>
+        <button class="tool" data-tool="object" title="Healing Brush — حذف شیء با ترمیم"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L11 15H7v-4l9.5-7.5Z"/><path d="M13.5 6.5l4 4"/><path d="M3 21h10"/></svg><b class="en">Healing Brush</b><span>حذف شیء</span></button>
+        <button class="tool" data-tool="clone" title="Clone — Alt+کلیک منبع، بعد نقاشی"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V6.5a3 3 0 0 1 6 0V11"/><path d="M4.5 11h15L18 15.5h-12L4.5 11Z"/><path d="M7 18.5h10V21H7z"/></svg><b class="en">Clone</b><span>کلون</span></button>
+        <button class="tool" data-tool="liquify" title="Liquify — کشیدن و تغییر فرم"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8c2.5 0 2.5 2 5 2s2.5-2 5-2 2.5 2 5 2 2-1 3-1"/><path d="M3 15c2.5 0 2.5 2 5 2s2.5-2 5-2 2.5 2 5 2 2-1 3-1"/></svg><b class="en">Liquify</b><span>تغییر فرم</span></button>
+        <button class="tool" data-tool="smudge" title="Smudge — مالیدن و محو"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a8 8 0 1 1-8-8"/><path d="M12 12a4 4 0 1 0-4-4"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg><b class="en">Smudge</b><span>محو کردن</span></button>
+        <button class="tool" data-tool="dodge" title="Dodge — روشن کردن"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2.5 12h2M19.5 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><b class="en">Dodge</b><span>روشن کن</span></button>
+        <button class="tool" data-tool="burn" title="Burn — تیره کردن"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13.5A8.5 8.5 0 0 1 10.5 4 8.5 8.5 0 1 0 20 13.5Z"/></svg><b class="en">Burn</b><span>تیره کن</span></button>
+        <button class="tool" data-tool="blurBrush" title="Blur — تاری قلمی"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6.5 6.8 6.5 11.5a6.5 6.5 0 0 1-13 0C5.5 9.8 12 3 12 3Z"/></svg><b class="en">Blur</b><span>تاری</span></button>
+        <button class="tool" data-tool="sharpenBrush" title="Sharpen — وضوح قلمی"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/><path d="M11 8.5v5M8.5 11h5"/></svg><b class="en">Sharpen</b><span>وضوح</span></button>
+        <button class="tool" data-tool="colorize" title="Colorize — رنگ‌آمیزی"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1.5 0 2.5-1 2.5-2.5 0-1.7 1.3-2.5 2.5-2.5H17a4 4 0 0 0 4-4c0-5-4-9-9-9Z"/><circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="7.5" r="1" fill="currentColor" stroke="none"/><circle cx="16.5" cy="10.5" r="1" fill="currentColor" stroke="none"/></svg><b class="en">Colorize</b><span>رنگی کن</span></button>
+        <button class="tool" data-tool="redeye" title="Red Eye Removal — کلیک روی چشم قرمز"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><b class="en">Red Eye Removal</b><span>چشم قرمز</span></button>
+        <button class="tool" data-tool="crop" title="Crop — کشیدن مستطیل و اعمال"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v16a2 2 0 0 0 2 2h16"/><path d="M2 6h16a2 2 0 0 1 2 2v16"/></svg><b class="en">Crop</b><span>برش</span></button>
+        <button class="tool" data-tool="text" title="Text — کلیک و تایپ متن"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14"/><path d="M12 5v14"/></svg><b class="en">Text</b><span>متن</span></button>
       </div>
     </section>
 
-    <!-- پنل حالت ابزار انتخاب‌شده، مثل Glamour Skin در اسکرین‌شات -->
+    <!-- پنل حالت ابزار فعال — مثل Mode در PhotoInstrument -->
     <section class="mode-panel">
-      <div class="section-header" data-i18n="mode">Mode — حالت ابزار</div>
-      <div class="mode-name"><span id="statusTool">ابزار: جابه‌جا</span></div>
-      <div class="mode-row">
-        <label class="check"><input type="radio" name="brushMode" checked> <span data-i18n="brushMode">Brush — قلم</span></label>
-        <label class="check"><input type="radio" name="brushMode"> <span data-i18n="eraserMode">Eraser — پاک‌کن</span></label>
+      <div class="phead blue"><span id="statusTool">ابزار: جابه‌جا</span></div>
+      <div class="mode-body">
+        <div class="mode-row">
+          <span class="mode-label" data-i18n="mode">Mode — حالت ابزار</span>
+          <label class="check"><input type="radio" name="brushMode" checked> <span data-i18n="brushMode">Brush — قلم</span></label>
+          <label class="check"><input type="radio" name="brushMode"> <span data-i18n="eraserMode">Eraser — پاک‌کن</span></label>
+        </div>
+        <div class="mode-sliders">
+          <div class="vslider">
+            <span data-i18n="sizeLabel">Size — اندازه قلم</span>
+            <input type="range" id="brushSize" min="5" max="500" value="60">
+            <b id="brushSizeVal">۶۰</b>
+          </div>
+          <div class="blob"><div></div></div>
+          <div class="vslider">
+            <span data-i18n="hardnessLabel">Hardness — سختی / قدرت</span>
+            <input type="range" id="brushStrength" min="5" max="100" value="50">
+            <b id="brushStrengthVal">۵۰٪</b>
+          </div>
+        </div>
+        <label class="color-row"><span data-i18n="colorLabel">رنگ (برای رنگی کردن)</span>
+          <input type="color" id="brushColor" value="#ff5a5a"></label>
+        <p class="tip" id="toolTip">برای کلون: Alt + کلیک روی منبع، بعد روی مقصد بکشید.</p>
       </div>
-      <label><span data-i18n="sizeLabel">Size — اندازه قلم</span> <span id="brushSizeVal">۶۰</span> <span data-i18n="pixels">پیکسل</span>
-        <input type="range" id="brushSize" min="5" max="500" value="60"></label>
-      <label><span data-i18n="hardnessLabel">Hardness — سختی / قدرت</span> <span id="brushStrengthVal">۵۰٪</span>
-        <input type="range" id="brushStrength" min="5" max="100" value="50"></label>
-      <label><span data-i18n="colorLabel">رنگ (برای رنگی کردن)</span>
-        <input type="color" id="brushColor" value="#ff5a5a"></label>
-      <p class="tip" id="toolTip">برای کلون: Alt + کلیک روی منبع، بعد روی مقصد بکشید.</p>
     </section>
 
     <!-- تنظیمات، زیر پنل ابزار -->
@@ -185,6 +208,8 @@
         <button id="btnBatch" class="btn primary" data-i18n="batchBtn">📦 انتخاب چند عکس و تبدیل</button>
       </details>
     </section>
+
+    <div class="thumb" id="leftThumbBox" hidden><img id="leftThumb" alt=""></div>
   </aside>
 
   <!-- بوم بزرگ در مرکز -->
@@ -196,13 +221,14 @@
         <div class="hint-card">
           <div class="hint-icon">🖼️</div>
           <h2 data-i18n="dropTitle">عکس را اینجا رها کنید</h2>
-          <p data-i18n="dropText">یا دکمه «باز کردن عکس» را بزنید — JPG ،PNG ،BMP ،GIF</p>
+          <p data-i18n="dropText">یا از منوی «فایل»، «باز کردن عکس» را بزنید — JPG ،PNG ،BMP ،GIF</p>
           <p class="hint-note" data-i18n="dropNote">عکس شما از دستگاهتان بیرون نمی‌رود؛ همه‌چیز روی همین کامپیوتر پردازش می‌شود.</p>
         </div>
       </div>
     </div>
     <div class="statusbar">
       <span id="statusSize">—</span>
+      <span id="zoomLabel">۱۰۰٪</span>
       <span id="statusEngine" data-i18n="engine">موتور: Rust + Tauri</span>
       <span id="statusMsg"></span>
     </div>
@@ -212,7 +238,7 @@
 <!-- انتخاب زبان در شروع برنامه -->
 <div id="langModal" class="modal" hidden>
   <div class="modal-card lang-card">
-    <div class="about-logo">🌐</div>
+    <div class="about-logo"><svg viewBox="0 0 48 48"><defs><linearGradient id="mlogA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f6fd0"/><stop offset="1" stop-color="#7b2ff7"/></linearGradient></defs><rect x="2" y="2" width="44" height="44" rx="10" fill="url(#mlogA)"/><path d="M11 36 V12 L24 27 L37 12 V36" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <h2 data-i18n="langTitle">زبان برنامه را انتخاب کنید</h2>
     <p data-i18n="langSub">Choose the app language</p>
     <div class="lang-options">
@@ -225,13 +251,26 @@
 <!-- پنجره درباره برنامه -->
 <div id="aboutModal" class="modal" hidden>
   <div class="modal-card">
-    <div class="about-logo">📷</div>
+    <div class="about-logo"><svg viewBox="0 0 48 48"><defs><linearGradient id="mlogB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f6fd0"/><stop offset="1" stop-color="#7b2ff7"/></linearGradient></defs><rect x="2" y="2" width="44" height="44" rx="10" fill="url(#mlogB)"/><path d="M11 36 V12 L24 27 L37 12 V36" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     <h2>Mori Instrument</h2>
-    <p class="about-ver" data-i18n="aboutVer">نسخه ۱٫۰٫۵ • Rust + Tauri</p>
+    <p class="about-ver" data-i18n="aboutVer">نسخه ۱٫۰٫۶ • Rust + Tauri</p>
     <p data-i18n="aboutBy">ساخته شده توسط Mori J</p>
     <p data-i18n="aboutIdea">ایده از برنامه PhotoInstrument</p>
     <p class="about-link">photoinstrument.com</p>
     <button id="aboutClose" class="btn primary" data-i18n="close">بستن</button>
+  </div>
+</div>
+
+<!-- پنجره تایید ذخیره هنگام خروج -->
+<div id="saveModal" class="modal" hidden>
+  <div class="modal-card">
+    <h2 data-i18n="saveAskTitle">تغییرات ذخیره نشده</h2>
+    <p data-i18n="saveAskText">عکس تغییر کرده است. قبل از خروج ذخیره شود؟</p>
+    <div class="row save-row">
+      <button id="btnSaveYes" class="btn primary" data-i18n="saveYes">ذخیره</button>
+      <button id="btnSaveNo" class="btn" data-i18n="saveNo">ذخیره نکن</button>
+      <button id="btnSaveCancel" class="btn" data-i18n="saveCancel">لغو</button>
+    </div>
   </div>
 </div>
 
